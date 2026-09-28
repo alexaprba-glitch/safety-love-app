@@ -2,6 +2,7 @@
 import { Mic, SquarePen, Trash2, MessageCircle, History, Send, ArrowLeft, Plus, Settings, User } from 'lucide-react';
 import twemoji from 'twemoji';
 import SafetyMascot from './SafetyMascot';
+import { toastError, toastSuccess } from './Toast';
 import { getUser } from './services/auth';
 import { getChatSessions, createChatSession, updateChatSession, deleteChatSession, getChatMessages, addChatMessage } from './services/chat';
 
@@ -72,7 +73,7 @@ export default function ChatIA({ darkMode = false, userPhotoUrl = null }) {
         }));
         setChatSessions(formatted);
         try { localStorage.setItem('chatia_history', JSON.stringify(formatted)); } catch {}
-      } catch {}
+      } catch { toastError('Error al cargar las sesiones del chat.'); }
     })();
     return () => { cancelled = true; };
   }, []);
@@ -101,7 +102,7 @@ export default function ChatIA({ darkMode = false, userPhotoUrl = null }) {
         for (const m of msgs) {
           await addChatMessage({ sessionId: activeSession, userId: uid, role: m.role === 'user' ? 'user' : 'bot', content: m.text });
         }
-      } catch {}
+      } catch { toastError('Error al guardar la sesión del chat.'); }
     } else if (uid) {
       try {
         const session = await createChatSession(uid, title);
@@ -115,7 +116,7 @@ export default function ChatIA({ darkMode = false, userPhotoUrl = null }) {
         setChatSessions(newSessions);
         try { localStorage.setItem('chatia_history', JSON.stringify(newSessions)); } catch {}
         return;
-      } catch {}
+      } catch { toastError('Error al guardar la sesión del chat.'); }
     }
 
     const newSessions = [
@@ -148,7 +149,7 @@ export default function ChatIA({ darkMode = false, userPhotoUrl = null }) {
           setMessages(formatted);
           return;
         }
-      } catch {}
+      } catch { toastError('Error al cargar los mensajes.'); }
     }
 
     setMessages(session.messages || initialMessages);
@@ -157,7 +158,7 @@ export default function ChatIA({ darkMode = false, userPhotoUrl = null }) {
   const deleteSession = async (id, e) => {
     e.stopPropagation();
     if (typeof id === 'number' && userIdRef.current) {
-      try { await deleteChatSession(id); } catch {}
+      try { await deleteChatSession(id); } catch { toastError('Error al eliminar la sesión.'); }
     }
     const updated = chatSessions.filter((s) => s.id !== id);
     setChatSessions(updated);
@@ -210,6 +211,7 @@ export default function ChatIA({ darkMode = false, userPhotoUrl = null }) {
       const botMsg = { id: Date.now() + 1, role: 'bot', text: botReply };
       setMessages((prev) => [...prev, botMsg]);
     } catch (err) {
+      toastError('Error al conectar con la IA. Verifica tu conexión e intenta de nuevo.');
       const botMsg = { id: Date.now() + 1, role: 'bot', text: `Error de conexion: ${err.message}` };
       setMessages((prev) => [...prev, botMsg]);
     } finally {

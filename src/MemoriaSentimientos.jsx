@@ -1,7 +1,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { RotateCcw, ChevronRight, Star, Clock, ArrowLeft, Layers, Users, Trophy, Brain, Shield } from 'lucide-react';
+import { RotateCcw, ChevronRight, Star, Clock, ArrowLeft, Layers, Users, Trophy, Brain, Shield, Footprints, Timer } from 'lucide-react';
 import SafetyMascot from './SafetyMascot';
+import { recordGameCompleted } from './gameStats';
 
 const EMOTIONS = [
   { emoji: '😊', label: 'Feliz' },
@@ -23,12 +24,9 @@ function shuffleArray(arr) {
   return a;
 }
 
-function saveGameStats(gameId, won) {
-  const stats = JSON.parse(localStorage.getItem('safetyLove_gameStats') || '{"played":0,"won":0,"stars":0}');
-  stats.played = (stats.played || 0) + 1;
-  if (won) stats.won = (stats.won || 0) + 1;
-  stats.stars = (stats.stars || 0) + (won ? 3 : 1);
-  localStorage.setItem('safetyLove_gameStats', JSON.stringify(stats));
+function saveGameStats(gameId, perfect) {
+  // Jugadas +1, Estrellas +2, Perfectas +1 solo si es partida perfecta
+  recordGameCompleted(perfect);
 }
 
 export default function MemoriaSentimientos({ darkMode = false, onBack }) {
@@ -80,7 +78,7 @@ export default function MemoriaSentimientos({ darkMode = false, onBack }) {
         setMatched(newMatched);
         setFlipped([]);
         if (newMatched.length === 6) {
-          const won = moves <= 15;
+          const won = moves <= 10;
           saveGameStats('memoria', won);
           setTimeout(() => {
             if (!bestTime || timer < bestTime) {
@@ -126,7 +124,7 @@ export default function MemoriaSentimientos({ darkMode = false, onBack }) {
             {/* ── BACK BUTTON ── */}
             <button
               onClick={onBack}
-              className="flex items-center gap-2 transition-all duration-200"
+              className="flex items-center gap-2 transition-all duration-200 mb-6"
               style={{
                 padding: '10px 22px',
                 borderRadius: '999px',
@@ -342,7 +340,7 @@ export default function MemoriaSentimientos({ darkMode = false, onBack }) {
           <div className="w-full max-w-[1100px]">
 
             {/* ── HEADER ROW ── */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-6" style={{ marginBottom: '24px' }}>
               <button
                 onClick={onBack}
                 className="flex items-center transition-all duration-200"
@@ -552,13 +550,14 @@ export default function MemoriaSentimientos({ darkMode = false, onBack }) {
           {/* ── BACK BUTTON ── */}
           <button
             onClick={onBack}
-            className="flex items-center transition-all duration-200 mb-8"
+            className="flex items-center transition-all duration-200 mb-6"
             style={{
               height: '40px', padding: '0 18px', borderRadius: '999px',
               border: dm ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)',
               background: dm ? 'rgba(255,255,255,0.04)' : '#FFFFFF',
               color: dm ? '#94A3B8' : '#475569',
               fontSize: '14px', fontWeight: 600, gap: '8px', cursor: 'pointer',
+              marginBottom: '24px',
             }}
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#F43F9E'; e.currentTarget.style.color = '#F43F9E'; }}
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = dm ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'; e.currentTarget.style.color = dm ? '#94A3B8' : '#475569'; }}
@@ -568,66 +567,143 @@ export default function MemoriaSentimientos({ darkMode = false, onBack }) {
 
           {/* ── RESULTS PANEL ── */}
           <div
-            className="relative"
+            className="relative rounded-3xl shadow-2xl"
             style={{
               borderRadius: '28px',
               padding: '44px 48px',
               background: dm ? '#111A2E' : '#FFFFFF',
-              border: '1px solid rgba(255,255,255,0.06)',
+              border: `1px solid ${dm ? 'rgba(255,255,255,0.06)' : '#F1F5F9'}`,
               boxShadow: '0 24px 80px rgba(0,0,0,0.25)',
               textAlign: 'center',
             }}
           >
-            {/* Emoji */}
-            <div style={{ fontSize: '64px', marginBottom: '16px' }}>🎉</div>
+            <style>{`
+              @keyframes mem-confetti { 0%,100% { transform: translateY(0) rotate(0deg); opacity: 0.9; } 50% { transform: translateY(-7px) rotate(20deg); opacity: 1; } }
+              .mem-confetti { animation: mem-confetti 2.6s ease-in-out infinite; }
+              @media (max-width: 640px) { .mem-kpi-grid { grid-template-columns: 1fr !important; } }
+            `}</style>
 
-            {/* Title */}
-            <h2 style={{ fontSize: '32px', fontWeight: 800, color: '#F8FAFC', marginBottom: '8px' }}>¡Completado!</h2>
-            <p style={{ fontSize: '16px', color: '#94A3B8', marginBottom: '28px' }}>
+            {/* ── 1. TROFEO DORADO + CONFETI ── */}
+            <div className="relative mx-auto" style={{ width: '132px', height: '108px', marginBottom: '18px' }}>
+              {[
+                { l: '2%', t: '12%', s: '8px', c: '#F43F9E', d: '0s', r: '12px' },
+                { l: '10%', t: '62%', s: '6px', c: '#A78BFA', d: '0.4s', r: '50%' },
+                { l: '20%', t: '4%', s: '7px', c: '#FBBF24', d: '0.8s', r: '2px' },
+                { l: '78%', t: '6%', s: '8px', c: '#06B6D4', d: '0.2s', r: '50%' },
+                { l: '88%', t: '60%', s: '6px', c: '#F43F9E', d: '1s', r: '2px' },
+                { l: '94%', t: '18%', s: '7px', c: '#A78BFA', d: '0.6s', r: '12px' },
+                { l: '32%', t: '0%', s: '6px', c: '#06B6D4', d: '1.2s', r: '50%' },
+                { l: '64%', t: '0%', s: '6px', c: '#FBBF24', d: '0.9s', r: '2px' },
+              ].map((p, i) => (
+                <span
+                  key={i}
+                  className="absolute mem-confetti"
+                  style={{ left: p.l, top: p.t, width: p.s, height: p.s, background: p.c, borderRadius: p.r, animationDelay: p.d }}
+                />
+              ))}
+              <motion.div
+                initial={{ scale: 0.6, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 17 }}
+                className="absolute flex items-center justify-center"
+                style={{
+                  left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
+                  width: '84px', height: '84px', borderRadius: '50%',
+                  background: dm ? 'linear-gradient(135deg, rgba(251,191,36,0.2), rgba(245,158,11,0.1))' : 'linear-gradient(135deg, #FFFBEB, #FEF3C7)',
+                  border: '2px solid rgba(251,191,36,0.4)',
+                  boxShadow: '0 12px 32px rgba(251,191,36,0.3)',
+                }}
+              >
+                <Trophy size={40} style={{ color: '#F59E0B' }} strokeWidth={2} fill="currentColor" fillOpacity={0.2} />
+              </motion.div>
+            </div>
+
+            {/* ── TÍTULO + SUBTÍTULO ── */}
+            <h2
+              className="font-black tracking-tight"
+              style={{
+                fontSize: '34px', fontWeight: 900, lineHeight: 1.1, marginBottom: '10px',
+                background: 'linear-gradient(135deg, #EC4899, #A78BFA)',
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+              }}
+            >
+              ¡COMPLETADO!
+            </h2>
+            <p style={{ fontSize: '15px', color: '#94A3B8', lineHeight: 1.6, marginBottom: '28px' }}>
               {moves <= 10 ? '¡Memoria increíble! Eres un genio de las emociones.' :
                moves <= 15 ? '¡Muy bien! Tu memoria funciona excelente.' :
                'Buen trabajo. Practicar más mejorará tu memoria.'}
             </p>
 
-            {/* Stats */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '28px' }}>
-              <div style={{ borderRadius: '18px', padding: '20px', background: dm ? 'rgba(255,255,255,0.03)' : '#F8FAFC', border: `1px solid ${dm ? 'rgba(255,255,255,0.06)' : '#F1E7EF'}` }}>
-                <p style={{ fontSize: '32px', fontWeight: 800, color: '#F43F9E', lineHeight: 1, marginBottom: '4px' }}>{moves}</p>
-                <p style={{ fontSize: '13px', fontWeight: 600, color: dm ? '#64748B' : '#64748B' }}>Movimientos</p>
-              </div>
-              <div style={{ borderRadius: '18px', padding: '20px', background: dm ? 'rgba(255,255,255,0.03)' : '#F8FAFC', border: `1px solid ${dm ? 'rgba(255,255,255,0.06)' : '#F1E7EF'}` }}>
-                <p style={{ fontSize: '32px', fontWeight: 800, color: '#A78BFA', lineHeight: 1, marginBottom: '4px' }}>{formatTime(timer)}</p>
-                <p style={{ fontSize: '13px', fontWeight: 600, color: dm ? '#64748B' : '#64748B' }}>Tiempo</p>
-              </div>
-              <div style={{ borderRadius: '18px', padding: '20px', background: dm ? 'rgba(255,255,255,0.03)' : '#F8FAFC', border: `1px solid ${dm ? 'rgba(255,255,255,0.06)' : '#F1E7EF'}` }}>
-                <p style={{ fontSize: '32px', fontWeight: 800, color: '#FBBF24', lineHeight: 1, marginBottom: '4px' }}>
-                  {bestTime && timer <= bestTime ? '🏆' : '⭐'}
-                </p>
-                <p style={{ fontSize: '13px', fontWeight: 600, color: dm ? '#64748B' : '#64748B' }}>
-                  {bestTime && timer <= bestTime ? '¡Nuevo récord!' : 'Mejor: ' + formatTime(bestTime || timer)}
-                </p>
-              </div>
+            {/* ── 2. KPI CARDS ── */}
+            <div className="mem-kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px', marginBottom: '28px' }}>
+              {[
+                { accent: '#F43F9E', Icon: Footprints, iconBg: 'rgba(244,63,158,0.1)', value: String(moves), label: 'Movimientos', badge: null },
+                { accent: '#F59E0B', Icon: Timer, iconBg: 'rgba(245,158,11,0.12)', value: formatTime(timer), label: 'Tiempo', badge: null },
+                {
+                  accent: '#38BDF8', Icon: Star, iconBg: 'rgba(56,189,248,0.12)', value: formatTime(bestTime || timer), label: 'Mejor tiempo',
+                  badge: (bestTime && timer <= bestTime) ? '¡Nuevo récord!' : null,
+                },
+              ].map((kpi) => (
+                <div
+                  key={kpi.label}
+                  style={{
+                    borderRadius: '18px',
+                    background: dm ? 'rgba(255,255,255,0.03)' : '#FFFFFF',
+                    border: `1px solid ${dm ? 'rgba(255,255,255,0.08)' : '#E5E7EB'}`,
+                    borderTop: `4px solid ${kpi.accent}`,
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+                    padding: '18px 12px 16px',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <span style={{
+                      width: '30px', height: '30px', borderRadius: '10px', flexShrink: 0,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', background: kpi.iconBg,
+                    }}>
+                      <kpi.Icon size={16} style={{ color: kpi.accent }} fill={kpi.label === 'Mejor tiempo' ? 'currentColor' : 'none'} />
+                    </span>
+                    <span style={{ fontSize: '26px', fontWeight: 800, color: dm ? '#F8FAFC' : '#0F172A', lineHeight: 1 }}>
+                      {kpi.value}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '10.5px', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.07em', margin: 0 }}>
+                    {kpi.label}
+                  </p>
+                  {kpi.badge && (
+                    <span style={{
+                      display: 'inline-block', marginTop: '8px', padding: '3px 10px', borderRadius: '999px',
+                      fontSize: '10px', fontWeight: 800, color: '#B45309', background: '#FEF3C7',
+                    }}>
+                      {kpi.badge}
+                    </span>
+                  )}
+                </div>
+              ))}
             </div>
 
-            {/* Play Again Button */}
+            {/* ── 3. CTA ── */}
             <button onClick={startGame}
-              className="w-full flex items-center justify-center transition-all duration-200"
+              className="w-full flex items-center justify-center rounded-full transition-all duration-200"
               style={{
-                height: '62px',
-                borderRadius: '18px',
-                background: 'linear-gradient(135deg, #F43F9E, #A78BFA, #06B6D4)',
+                height: '58px',
+                borderRadius: '999px',
+                background: 'linear-gradient(135deg, #EC4899, #8B5CF6 55%, #06B6D4)',
                 color: '#FFFFFF',
-                fontSize: '18px',
+                fontSize: '16px',
                 fontWeight: 800,
                 gap: '10px',
-                boxShadow: '0 10px 32px rgba(168,85,247,0.25)',
+                boxShadow: '0 10px 28px rgba(236,72,153,0.35)',
                 border: 'none',
                 cursor: 'pointer',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 14px 40px rgba(168,85,247,0.35)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 32px rgba(168,85,247,0.25)'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 14px 36px rgba(236,72,153,0.45)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 28px rgba(236,72,153,0.35)'; }}
+              onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.98)'; }}
+              onMouseUp={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
             >
-              <RotateCcw size={20} /> Jugar de nuevo
+              <RotateCcw size={19} /> Jugar de nuevo
             </button>
           </div>
         </div>

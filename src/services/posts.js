@@ -1,9 +1,11 @@
 import { supabase } from '../supabase';
 
+const POST_COLUMNS = 'id, user_id, author_name, content, category, is_anonymous, image_url, avatar_initials, avatar_color, mood, reactions, created_at';
+
 export async function getPosts({ limit = 50, offset = 0, category = null } = {}) {
   let query = supabase
     .from('posts')
-    .select('*')
+    .select(POST_COLUMNS)
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
 
@@ -42,7 +44,7 @@ export async function createPost({
   const { data, error } = await supabase
     .from('posts')
     .insert(entry)
-    .select()
+    .select(POST_COLUMNS)
     .single();
   if (error) throw error;
   return data;
@@ -57,12 +59,13 @@ export async function deletePost(postId, userId) {
   if (error) throw error;
 }
 
-export async function getPostComments(postId) {
+export async function getPostComments(postId, { limit = 100 } = {}) {
   const { data, error } = await supabase
     .from('comments')
-    .select('*')
+    .select('id, post_id, user_id, author_name, content, created_at')
     .eq('post_id', postId)
-    .order('created_at', { ascending: true });
+    .order('created_at', { ascending: true })
+    .limit(limit);
   if (error) throw error;
   return data;
 }
@@ -71,7 +74,7 @@ export async function addComment({ postId, userId, authorName, content }) {
   const { data, error } = await supabase
     .from('comments')
     .insert({ post_id: postId, user_id: userId, author_name: authorName, content })
-    .select()
+    .select('id, post_id, user_id, author_name, content, created_at')
     .single();
   if (error) throw error;
   return data;
@@ -84,15 +87,4 @@ export async function deleteComment(commentId, userId) {
     .eq('id', commentId)
     .eq('user_id', userId);
   if (error) throw error;
-}
-
-export async function getStudentPostsForPsychologist(studentIds) {
-  if (!studentIds || studentIds.length === 0) return [];
-  const { data, error } = await supabase
-    .from('posts')
-    .select('*')
-    .in('user_id', studentIds)
-    .order('created_at', { ascending: false });
-  if (error) throw error;
-  return data;
 }

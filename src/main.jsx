@@ -1,9 +1,13 @@
-import React, { useState, useEffect, Component } from 'react'
+import React, { useState, useEffect, useCallback, useRef, Component } from 'react'
 import ReactDOM from 'react-dom/client'
 import LandingPage from './LandingPage.jsx'
 import LoginPage from './LoginPage.jsx'
 import DashboardEscritorio from './DashboardEscritorio.jsx'
 import PsychologistDashboard from './PsychologistDashboard.jsx'
+import LogoutScreen from './LogoutScreen.jsx'
+import { supabase } from './supabase'
+import { signOut } from './services/auth'
+import { ToastProvider } from './Toast.jsx'
 import { Lock } from 'lucide-react'
 
 import './index.css'
@@ -181,10 +185,20 @@ function PinLockScreen({ onUnlock, userEmail }) {
 }
 
 function App() {
-  const [view, setView] = useState('landing');
+  const [view, setView] = useState(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('preview') === 'dashboard') return 'dashboard';
+      if (params.get('preview') === 'psychologist') return 'dashboard';
+    } catch {}
+    return 'landing';
+  });
   const [avatarOnboarding, setAvatarOnboarding] = useState(false);
   const [userRole, setUserRole] = useState('user');
   const [currentUserEmail, setCurrentUserEmail] = useState('');
+  const [showLogoutScreen, setShowLogoutScreen] = useState(false);
+  const [sessionChecked, setSessionChecked] = useState(false);
+  const [hasSession, setHasSession] = useState(false);
   const [pinUnlocked, setPinUnlocked] = useState(() => {
     const email = localStorage.getItem('safetyLove_userEmail') || localStorage.getItem('safetyLove_psychEmail') || '';
     if (email) {
@@ -192,6 +206,47 @@ function App() {
     }
     return localStorage.getItem('safetyLove_pinLock') !== 'true';
   });
+
+  const logoutInProgress = useRef(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const check = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (mounted) {
+        setHasSession(!!session);
+        setSessionChecked(true);
+      }
+    };
+    check();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!mounted) return;
+      setHasSession(!!session);
+      if (event === 'SIGNED_OUT') {
+        setShowLogoutScreen(false);
+        setView('landing');
+        setUserRole('user');
+        setCurrentUserEmail('');
+        setPinUnlocked(true);
+        logoutInProgress.current = false;
+        localStorage.removeItem('safetyLove_userEmail');
+        localStorage.removeItem('safetyLove_psychEmail');
+        localStorage.removeItem('safetyLove_pin');
+        localStorage.removeItem('safetyLove_pinLock');
+      }
+      if (event === 'SIGNED_IN' && session?.user) {
+        const email = session.user.email || '';
+        setCurrentUserEmail(email);
+        const role = session.user.user_metadata?.role || 'adolescente';
+        setUserRole(role);
+      }
+    });
+
+    return () => { mounted = false; subscription?.unsubscribe(); };
+  }, []);
+
   const previewDashboard = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('preview') === 'dashboard';
   const previewPsy = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('preview') === 'psychologist';
 
@@ -215,8 +270,57 @@ function App() {
     setView('dashboard');
   };
 
-  if (previewDashboard) return <ErrorBoundary><DashboardEscritorio /></ErrorBoundary>;
-  if (previewPsy) return <ErrorBoundary><PsychologistDashboard /></ErrorBoundary>;
+  const handleLogoutClick = useCallback(() => {
+    if (logoutInProgress.current) return;
+    logoutInProgress.current = true;
+    setShowLogoutScreen(true);
+  }, []);
+
+  const handleLogoutComplete = useCallback(async () => {
+    clearDarkMode();
+    try { await signOut(); } catch {}
+    setShowLogoutScreen(false);
+    setPinUnlocked(true);
+    setUserRole('user');
+    setCurrentUserEmail('');
+    setView('landing');
+    logoutInProgress.current = false;
+  }, []);
+
+  useEffect(() => {
+    if (sessionChecked && view === 'dashboard' && !hasSession) {
+      setView('landing');
+    }
+  }, [sessionChecked, view, hasSession]);
+
+  if (!sessionChecked && !previewDashboard && !previewPsy) {
+    return (
+      <div style={{
+        minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: 'linear-gradient(160deg, #FFF5F7 0%, #FFFFFF 40%, #FFF0F5 100%)',
+        fontFamily: "'Poppins', sans-serif"
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: 40, height: 40, border: '3px solid #F9A8D4', borderTop: '3px solid #EC4899',
+            borderRadius: '50%', margin: '0 auto 16px', animation: 'spin 1s linear infinite'
+          }} />
+          <p style={{ color: '#94A3B8', fontSize: '14px', fontWeight: 500 }}>Cargando Safety Love...</p>
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      </div>
+    );
+  }
+
+  if (previewDashboard) return <ErrorBoundary><DashboardEscritorio onLogout={handleLogoutClick} /></ErrorBoundary>;
+  if (previewPsy) return <ErrorBoundary><PsychologistDashboard onLogout={handleLogoutClick} /></ErrorBoundary>;
+
+  if (showLogoutScreen) {
+    return (
+      <LogoutScreen onComplete={handleLogoutComplete} />
+    );
+  }
+
   if (view === 'landing') return <LandingPage onEnterApp={(mode) => { if (mode === 'signup') { setView('signup'); } else { setView('login'); } }} />;
   if (view === 'login') return (
     <LoginPage
@@ -239,17 +343,19 @@ function App() {
     return <PinLockScreen onUnlock={() => setPinUnlocked(true)} userEmail={currentUserEmail} />;
   }
 
-  if (userRole === 'psychologist') return <ErrorBoundary><PsychologistDashboard onLogout={() => { clearDarkMode(); setPinUnlocked(true); setView('login'); }} /></ErrorBoundary>;
+  if (userRole === 'psychologist') return <ErrorBoundary><PsychologistDashboard onLogout={handleLogoutClick} /></ErrorBoundary>;
 
   return (
     <ErrorBoundary key={view}>
-      <DashboardEscritorio onLogout={() => { clearDarkMode(); setPinUnlocked(true); setView('login'); }} />
+      <DashboardEscritorio onLogout={handleLogoutClick} />
     </ErrorBoundary>
   );
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App />
+    <ToastProvider>
+      <App />
+    </ToastProvider>
   </React.StrictMode>,
 )

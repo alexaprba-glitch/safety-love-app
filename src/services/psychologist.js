@@ -28,7 +28,7 @@ export async function assignStudentToPsychologist(studentId, psychologistId) {
       { student_id: studentId, psychologist_id: psychologistId, status: 'active' },
       { onConflict: 'student_id' }
     )
-    .select()
+    .select('student_id, psychologist_id, assigned_at, status')
     .single();
   if (error) throw error;
   return data;
@@ -40,18 +40,4 @@ export async function unassignStudent(studentId) {
     .update({ status: 'inactive' })
     .eq('student_id', studentId);
   if (error) throw error;
-}
-
-export async function getStudentFullProfile(studentId) {
-  const [profileRes, moodsRes, postsRes] = await Promise.all([
-    supabase.from('profiles').select('*').eq('id', studentId).single(),
-    supabase.from('mood_entries').select('date, emoji, description, intensity').eq('user_id', studentId),
-    supabase.from('posts').select('*').eq('user_id', studentId).order('created_at', { ascending: false }),
-  ]);
-
-  return {
-    profile: profileRes.data,
-    moods: moodsRes.data || [],
-    posts: postsRes.data || [],
-  };
 }

@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flag, RotateCcw, Trophy, Star, ChevronRight, Lightbulb, ArrowLeft, Clock, FileText, Shield } from 'lucide-react';
+import { Flag, RotateCcw, Trophy, Star, ChevronRight, Lightbulb, ArrowLeft, Clock, FileText, Shield, Check, X } from 'lucide-react';
+import { awardPetStarsForPlay } from './petStars';
+import { recordGameCompleted } from './gameStats';
 
-function saveGameStats(gameId, won) {
-  const stats = JSON.parse(localStorage.getItem('safetyLove_gameStats') || '{"played":0,"won":0,"stars":0}');
-  stats.played = (stats.played || 0) + 1;
-  if (won) stats.won = (stats.won || 0) + 1;
-  stats.stars = (stats.stars || 0) + (won ? 3 : 1);
-  localStorage.setItem('safetyLove_gameStats', JSON.stringify(stats));
+function saveGameStats(gameId, perfect) {
+  // Jugadas +1, Estrellas +2, Perfectas +1 solo si >9 correctas
+  recordGameCompleted(perfect);
 }
 
 const SITUATIONS = [
@@ -101,7 +100,7 @@ export default function GreenRedFlagGame({ darkMode = false, onBack }) {
 
   const nextQuestion = () => {
     if (currentIndex + 1 >= totalQuestions) {
-      const won = score >= 8;
+      const won = score > 9;
       saveGameStats('green-red-flag', won);
       setGameState('summary');
     } else {
@@ -109,14 +108,6 @@ export default function GreenRedFlagGame({ darkMode = false, onBack }) {
       setSelectedAnswer(null);
       setShowExplanation(false);
     }
-  };
-
-  const getEmoji = () => {
-    const pct = (score / totalQuestions) * 100;
-    if (pct >= 90) return '🏆';
-    if (pct >= 70) return '🌟';
-    if (pct >= 50) return '👍';
-    return '💪';
   };
 
   const getMessage = () => {
@@ -177,7 +168,7 @@ export default function GreenRedFlagGame({ darkMode = false, onBack }) {
             {/* ── BACK BUTTON ── */}
             <button
               onClick={onBack}
-              className="flex items-center gap-2 transition-all duration-200"
+              className="flex items-center gap-2 transition-all duration-200 mb-6"
               style={{
                 padding: '10px 22px',
                 borderRadius: '999px',
@@ -274,33 +265,34 @@ export default function GreenRedFlagGame({ darkMode = false, onBack }) {
                   borderRadius: '24px',
                   padding: '32px',
                   marginBottom: '28px',
-                  background: dm ? 'rgba(255,255,255,0.03)' : '#F8FAFC',
-                  border: `1px solid ${dm ? 'rgba(255,255,255,0.06)' : '#F1E7EF'}`,
+                  background: dm ? 'rgba(255,255,255,0.06)' : '#FFFFFF',
+                  border: dm ? '1px solid rgba(255,255,255,0.1)' : '1px solid #E2E8F0',
+                  boxShadow: dm ? '0 8px 32px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.05)',
                   minHeight: '130px',
                   alignItems: 'center',
                 }}
               >
                 {/* Block 1: Questions */}
                 <div style={{ textAlign: 'center', padding: '0 24px' }}>
-                  <div style={{ width: '52px', height: '52px', borderRadius: '14px', background: 'rgba(34,197,94,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
-                    <FileText size={24} style={{ color: '#22C55E' }} />
+                  <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'rgba(34,197,94,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
+                    <FileText size={26} style={{ color: '#22C55E' }} />
                   </div>
-                  <p style={{ fontSize: '48px', fontWeight: 800, color: '#0F172A', lineHeight: 1, marginBottom: '6px' }}>{totalQuestions}</p>
-                  <p style={{ fontSize: '16px', fontWeight: 700, color: '#1E293B', marginBottom: '4px' }}>Preguntas</p>
-                  <p style={{ fontSize: '14px', color: '#475569' }}>Desafía tu intuición</p>
+                  <p style={{ fontSize: '48px', fontWeight: 800, color: dm ? '#F8FAFC' : '#0F172A', lineHeight: 1, marginBottom: '6px' }}>{totalQuestions}</p>
+                  <p style={{ fontSize: '16px', fontWeight: 700, color: dm ? '#E2E8F0' : '#1E293B', marginBottom: '4px' }}>Preguntas</p>
+                  <p style={{ fontSize: '14px', color: dm ? '#94A3B8' : '#475569' }}>Desafía tu intuición</p>
                 </div>
 
                 {/* Divider */}
-                <div className="grf-info-divider" style={{ width: '1px', height: '80px', background: 'rgba(255,255,255,0.08)', margin: '0 8px' }} />
+                <div className="grf-info-divider" style={{ width: '1px', height: '80px', background: dm ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)', margin: '0 8px' }} />
 
                 {/* Block 2: No time limit */}
                 <div style={{ textAlign: 'center', padding: '0 24px' }}>
-                  <div style={{ width: '52px', height: '52px', borderRadius: '14px', background: 'rgba(59,130,246,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
-                    <Clock size={24} style={{ color: '#3B82F6' }} />
+                  <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'rgba(59,130,246,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
+                    <Clock size={26} style={{ color: '#3B82F6' }} />
                   </div>
-                  <p style={{ fontSize: '24px', fontWeight: 700, color: '#0F172A', lineHeight: 1.2, marginBottom: '6px' }}>Sin tiempo límite</p>
-                  <p style={{ fontSize: '15px', color: '#1E293B', marginBottom: '2px' }}>Juega a tu ritmo</p>
-                  <p style={{ fontSize: '14px', color: '#475569' }}>Sin presión, sin apuros</p>
+                  <p style={{ fontSize: '24px', fontWeight: 700, color: dm ? '#F8FAFC' : '#0F172A', lineHeight: 1.2, marginBottom: '6px' }}>Sin tiempo límite</p>
+                  <p style={{ fontSize: '15px', color: dm ? '#E2E8F0' : '#1E293B', marginBottom: '2px' }}>Juega a tu ritmo</p>
+                  <p style={{ fontSize: '14px', color: dm ? '#94A3B8' : '#475569' }}>Sin presión, sin apuros</p>
                 </div>
               </div>
 
@@ -366,27 +358,31 @@ export default function GreenRedFlagGame({ darkMode = false, onBack }) {
         <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-pink-200/10 blur-2xl" />
         <div className="absolute bottom-20 right-10 w-40 h-40 rounded-full bg-purple-200/10 blur-2xl" />
 
-        <div className="relative z-10 flex items-center justify-center min-h-[calc(100vh-200px)] p-6 md:p-10">
+        <div className="relative z-10 flex items-start justify-center min-h-[calc(100vh-200px)] p-6 md:p-10" style={{ paddingTop: '32px' }}>
           <div className="w-full max-w-[1050px]">
+            {/* ── BACK BUTTON (encima de la tarjeta, con separación) ── */}
+            <button
+              onClick={onBack}
+              className="flex items-center transition-all duration-200 mt-4 mb-6"
+              style={{
+                height: '40px', padding: '0 18px', borderRadius: '999px',
+                border: dm ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)',
+                background: dm ? 'rgba(255,255,255,0.04)' : '#FFFFFF',
+                color: dm ? '#94A3B8' : '#475569',
+                fontSize: '14px', fontWeight: 600, gap: '8px', cursor: 'pointer',
+                marginTop: '16px',
+                marginBottom: '24px',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#F43F9E'; e.currentTarget.style.color = '#F43F9E'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = dm ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'; e.currentTarget.style.color = dm ? '#94A3B8' : '#475569'; }}
+            >
+              <ArrowLeft size={16} strokeWidth={2.2} /> Volver
+            </button>
+
             <div className="rounded-[28px] p-8 md:p-12" style={{ background: d.cardBg, boxShadow: d.cardShadow, border: `1px solid ${d.cardBorder}`, minHeight: '750px' }}>
 
               {/* Header */}
-              <div className="flex items-center justify-between mb-8">
-                <button
-                  onClick={onBack}
-                  className="flex items-center transition-all duration-200"
-                  style={{
-                    height: '40px', padding: '0 18px', borderRadius: '999px',
-                    border: dm ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)',
-                    background: dm ? 'rgba(255,255,255,0.04)' : '#FFFFFF',
-                    color: dm ? '#94A3B8' : '#475569',
-                    fontSize: '14px', fontWeight: 600, gap: '8px', cursor: 'pointer',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#F43F9E'; e.currentTarget.style.color = '#F43F9E'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = dm ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'; e.currentTarget.style.color = dm ? '#94A3B8' : '#475569'; }}
-                >
-                  <ArrowLeft size={16} strokeWidth={2.2} /> Volver
-                </button>
+              <div className="flex items-center justify-end mb-8">
                 <div className="flex items-center gap-2 px-4 py-2 rounded-full" style={{ background: d.scoreBg }}>
                   <Star size={14} className="text-amber-400" fill="currentColor" />
                   <span className="text-[13px] font-bold" style={{ color: d.scoreColor }}>{score}</span>
@@ -548,8 +544,37 @@ export default function GreenRedFlagGame({ darkMode = false, onBack }) {
     );
   }
 
+  // ── Anillo de progreso SVG para los KPIs del resumen ──
+  const KpiRing = ({ fraction, label, display, color, track }) => {
+    const r = 34;
+    const c = 2 * Math.PI * r;
+    const pct = Math.max(0, Math.min(1, fraction));
+    return (
+      <div
+        className="rounded-[20px] p-6 text-center transition-all duration-200"
+        style={{ background: dm ? 'rgba(255,255,255,0.03)' : '#FFFFFF', border: `1.5px solid ${color}33`, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}
+      >
+        <div className="relative mx-auto mb-3" style={{ width: '88px', height: '88px' }}>
+          <svg width="88" height="88" viewBox="0 0 88 88" className="-rotate-90">
+            <circle cx="44" cy="44" r={r} fill="none" strokeWidth="9" stroke={track} />
+            <circle
+              cx="44" cy="44" r={r} fill="none" strokeWidth="9" strokeLinecap="round"
+              stroke={color} strokeDasharray={c} strokeDashoffset={c * (1 - pct)}
+              style={{ transition: 'stroke-dashoffset 0.8s ease-out' }}
+            />
+          </svg>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-[20px] font-extrabold" style={{ color }}>{display}</span>
+          </div>
+        </div>
+        <p className="text-[11px] font-bold uppercase" style={{ color: d.subtitleColor, letterSpacing: '0.08em' }}>{label}</p>
+      </div>
+    );
+  };
+
   // Summary
   const isPerfect = score === totalQuestions;
+  const accuracy = Math.round((score / totalQuestions) * 100);
   return (
     <div className={`min-h-full relative overflow-hidden ${dm ? 'bg-[#070D1C]' : 'bg-[#F5F0E8]'}`}>
       <div className="absolute top-20 left-10 w-32 h-32 rounded-full bg-pink-200/10 blur-2xl" />
@@ -569,18 +594,20 @@ export default function GreenRedFlagGame({ darkMode = false, onBack }) {
         </motion.div>
       )}
 
-      <div className="relative z-10 flex items-center justify-center min-h-[calc(100vh-200px)] p-6 md:p-10">
+      <div className="relative z-10 flex items-start justify-center min-h-[calc(100vh-200px)] p-6 md:p-10" style={{ paddingTop: '32px' }}>
         <div className="w-full max-w-[1050px]">
           {/* ── BACK BUTTON ── */}
           <button
             onClick={onBack}
-            className="flex items-center transition-all duration-200 mb-6"
+            className="flex items-center transition-all duration-200 mt-4 mb-6"
             style={{
               height: '40px', padding: '0 18px', borderRadius: '999px',
               border: dm ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)',
               background: dm ? 'rgba(255,255,255,0.04)' : '#FFFFFF',
               color: dm ? '#94A3B8' : '#475569',
               fontSize: '14px', fontWeight: 600, gap: '8px', cursor: 'pointer',
+              marginTop: '16px',
+              marginBottom: '24px',
             }}
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#F43F9E'; e.currentTarget.style.color = '#F43F9E'; }}
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = dm ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'; e.currentTarget.style.color = dm ? '#94A3B8' : '#475569'; }}
@@ -588,43 +615,158 @@ export default function GreenRedFlagGame({ darkMode = false, onBack }) {
             <ArrowLeft size={16} strokeWidth={2.2} /> Volver
           </button>
 
-          <div className="rounded-[28px] p-8 md:p-12 text-center" style={{ background: d.cardBg, boxShadow: d.cardShadow, border: `1px solid ${d.cardBorder}` }}>
-            <div className="text-[64px] mb-4">{getEmoji()}</div>
-            <h2 className="text-[28px] font-extrabold mb-3 tracking-tight" style={{ color: d.titleColor }}>¡Juego terminado!</h2>
+          <div className="rounded-[28px] p-8 md:p-12" style={{ background: d.cardBg, boxShadow: d.cardShadow, border: `1px solid ${d.cardBorder}` }}>
 
-            <div className="rounded-[20px] p-6 mb-8" style={{ background: d.statsBg, border: `1px solid ${d.statsBorder}` }}>
-              <div className="grid grid-cols-3 gap-6 text-center">
-                <div>
-                  <p className="text-[36px] font-extrabold text-[#F43F9E]">{score}/{totalQuestions}</p>
-                  <p className="text-[12px] font-semibold" style={{ color: d.subtitleColor }}>Correctas</p>
-                </div>
-                <div>
-                  <p className="text-[36px] font-extrabold text-orange-500">🔥 {bestStreak}</p>
-                  <p className="text-[12px] font-semibold" style={{ color: d.subtitleColor }}>Mejor racha</p>
-                </div>
-                <div>
-                  <p className="text-[36px] font-extrabold text-emerald-500">{Math.round((score / totalQuestions) * 100)}%</p>
-                  <p className="text-[12px] font-semibold" style={{ color: d.subtitleColor }}>Precisión</p>
-                </div>
+            {/* ── 1. ENCABEZADO + TROFEO ── */}
+            <div className="text-center" style={{ marginBottom: '28px' }}>
+              <style>{`
+                @keyframes grf-trophy-confetti { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+                .grf-trophy-confetti { animation: grf-trophy-confetti 2.8s ease-in-out infinite; }
+              `}</style>
+              <div className="relative mx-auto" style={{ width: '160px', height: '148px', marginBottom: '14px' }}>
+                {[
+                  { l: '16%', t: '6%', s: '10px', c: '#F472B6', r: '50%', d: '0s' },
+                  { l: '31%', t: '3%', s: '9px', c: '#FBBF24', r: '2px', d: '0.4s' },
+                  { l: '46%', t: '6%', s: '9px', c: '#2DD4BF', r: '50%', d: '0.8s' },
+                  { l: '60%', t: '1%', s: '9px', c: '#FBBF24', r: '2px', d: '0.2s' },
+                  { l: '73%', t: '5%', s: '9px', c: '#2DD4BF', r: '50%', d: '0.6s' },
+                  { l: '85%', t: '12%', s: '10px', c: '#A78BFA', r: '50%', d: '1s' },
+                  { l: '5%', t: '44%', s: '7px', c: '#A78BFA', r: '50%', d: '1.2s' },
+                ].map((p, i) => (
+                  <span
+                    key={i}
+                    className="absolute grf-trophy-confetti"
+                    style={{ left: p.l, top: p.t, width: p.s, height: p.s, background: p.c, borderRadius: p.r, animationDelay: p.d }}
+                  />
+                ))}
+                <span
+                  className="absolute grf-trophy-confetti"
+                  style={{ right: '0%', top: '72%', width: '6px', height: '16px', background: '#F472B6', borderRadius: '3px', transform: 'rotate(18deg)', animationDelay: '0.5s' }}
+                />
+                <motion.div
+                  initial={{ scale: 0.6, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 260, damping: 18 }}
+                  className="absolute flex items-center justify-center"
+                  style={{
+                    left: '50%', bottom: 0, transform: 'translateX(-50%)',
+                    width: '104px', height: '104px', borderRadius: '50%',
+                    background: dm ? 'rgba(251,191,36,0.06)' : '#FFFBEB',
+                    border: '1.5px solid #FED7AA',
+                    boxShadow: '0 0 36px rgba(251,191,36,0.28)',
+                  }}
+                >
+                  <Trophy size={46} style={{ color: '#F59E0B' }} strokeWidth={1.8} />
+                </motion.div>
+              </div>
+              <h2 className="text-[30px] md:text-[34px] font-extrabold tracking-tight" style={{ color: d.titleColor, marginBottom: '10px' }}>
+                ¡Juego Terminado!
+              </h2>
+              <p className="text-[15px] leading-relaxed mx-auto" style={{ color: '#94A3B8', maxWidth: '480px' }}>
+                {getMessage()}
+              </p>
+            </div>
+
+            {/* ── 2. TARJETAS DE ESTADÍSTICAS (KPIs) ── */}
+            <div className="grid gap-4 mb-8" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
+              <KpiRing
+                fraction={score / totalQuestions}
+                display={`${score}/${totalQuestions}`}
+                label="Correctas"
+                color="#8B5CF6"
+                track={dm ? 'rgba(139,92,246,0.15)' : '#EDE9FE'}
+              />
+              <KpiRing
+                fraction={bestStreak / totalQuestions}
+                display={String(bestStreak)}
+                label="Mejor racha"
+                color="#F59E0B"
+                track={dm ? 'rgba(245,158,11,0.15)' : '#FEF3C7'}
+              />
+              <KpiRing
+                fraction={accuracy / 100}
+                display={`${accuracy}%`}
+                label="Precisión"
+                color="#10B981"
+                track={dm ? 'rgba(16,185,129,0.15)' : '#D1FAE5'}
+              />
+            </div>
+
+            {/* ── 3. LISTA DE PREGUNTAS / RESPUESTAS ── */}
+            <div
+              className="rounded-[20px] p-4 md:p-5 text-left mb-8"
+              style={{
+                background: dm ? 'rgba(255,255,255,0.02)' : '#FFFFFF',
+                border: `1px solid ${dm ? 'rgba(255,255,255,0.08)' : '#E5E7EB'}`,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              }}
+            >
+              <p className="text-[11px] font-bold uppercase px-2" style={{ color: d.subtitleColor, letterSpacing: '0.08em', marginBottom: '12px' }}>
+                Revisa tus respuestas
+              </p>
+              <div className="space-y-2 overflow-y-auto pr-1" style={{ maxHeight: '300px' }}>
+                {answers.map((a, i) => {
+                  const ok = a.correct;
+                  const isGreen = a.userAnswer === 'green';
+                  return (
+                    <div
+                      key={i}
+                      className="flex items-center"
+                      style={{
+                        gap: '12px',
+                        padding: '12px 14px',
+                        borderRadius: '14px',
+                        background: ok
+                          ? (dm ? 'rgba(16,185,129,0.08)' : '#ECFDF5')
+                          : (dm ? 'rgba(244,63,94,0.08)' : '#FFF1F2'),
+                        border: `1px solid ${ok ? 'rgba(16,185,129,0.2)' : 'rgba(244,63,94,0.2)'}`,
+                      }}
+                    >
+                      {/* Estado */}
+                      <span
+                        className="flex items-center justify-center shrink-0"
+                        style={{
+                          width: '28px', height: '28px', borderRadius: '50%',
+                          background: ok ? '#10B981' : '#F43F5E',
+                          boxShadow: ok ? '0 2px 8px rgba(16,185,129,0.3)' : '0 2px 8px rgba(244,63,94,0.3)',
+                        }}
+                      >
+                        {ok
+                          ? <Check size={15} style={{ color: '#fff' }} strokeWidth={3} />
+                          : <X size={15} style={{ color: '#fff' }} strokeWidth={3} />}
+                      </span>
+                      {/* Texto */}
+                      <span className="text-[13.5px] font-medium leading-snug flex-1" style={{ color: d.questionColor }}>
+                        {a.text}
+                      </span>
+                      {/* Bandera */}
+                      <span
+                        className="shrink-0 text-[10px] font-extrabold uppercase"
+                        style={{
+                          padding: '4px 10px', borderRadius: '999px', letterSpacing: '0.05em',
+                          background: isGreen ? 'rgba(16,185,129,0.12)' : 'rgba(244,63,94,0.1)',
+                          color: isGreen ? '#059669' : '#E11D48',
+                          border: `1px solid ${isGreen ? 'rgba(16,185,129,0.25)' : 'rgba(244,63,94,0.25)'}`,
+                        }}
+                      >
+                        {isGreen ? 'Green Flag' : 'Red Flag'}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
-            <p className="text-[14px] mb-8" style={{ color: d.subtitleColor }}>{getMessage()}</p>
-
-            <div className="text-left mb-8 space-y-2">
-              {answers.map((a, i) => (
-                <div key={i} className={`flex items-center gap-3 p-4 rounded-[14px] text-[13px] ${a.correct ? (dm ? 'bg-emerald-500/10' : 'bg-emerald-50') : (dm ? 'bg-rose-500/10' : 'bg-rose-50')}`}>
-                  <span className="text-[16px]">{a.correct ? '✅' : '❌'}</span>
-                  <span className="font-medium" style={{ color: d.titleColor }}>{a.text.slice(0, 50)}...</span>
-                  <span className="ml-auto">{a.answer === 'green' ? '🟢' : '🔴'}</span>
-                </div>
-              ))}
-            </div>
-
+            {/* ── 4. CTA PRINCIPAL ── */}
             <button onClick={startGame}
-              className="w-full h-16 rounded-[16px] bg-gradient-to-r from-[#F43F9E] to-[#E83D8A] text-white text-[16px] font-bold hover:from-[#E83D8A] hover:to-[#D42F7A] transition-all duration-200 shadow-[0_4px_20px_rgba(244,63,158,0.3)] hover:shadow-[0_6px_28px_rgba(244,63,158,0.4)] flex items-center justify-center gap-2 active:scale-[0.98]">
+              className="w-full h-[60px] rounded-full bg-gradient-to-r from-[#F43F9E] to-[#E83D8A] text-white text-[16px] font-bold hover:from-[#E83D8A] hover:to-[#D42F7A] transition-all duration-200 shadow-[0_4px_20px_rgba(244,63,158,0.3)] hover:shadow-[0_6px_28px_rgba(244,63,158,0.4)] hover:-translate-y-0.5 flex items-center justify-center gap-2 active:scale-[0.98] active:translate-y-0">
               <RotateCcw size={18} /> Jugar de nuevo
             </button>
+
+            {/* ── 5. FOOTER SECUNDARIO ── */}
+            <p className="text-center text-[12px]" style={{ color: '#94A3B8', marginTop: '18px' }}>
+              Cada partida suma +2 ⭐ a tu mercado, juegues como juegues.
+            </p>
           </div>
         </div>
       </div>

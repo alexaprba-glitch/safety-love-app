@@ -68,7 +68,7 @@ export default function MascotSelector({ isOpen, onClose, onSelect, currentMasco
             >
               <div className="flex items-center gap-4">
                 <img
-                  src="/logo.png"
+                  src="/logo.webp" loading="lazy" width="48" height="48"
                   alt="SafetyLove"
                   style={{ width: '96px', height: '96px', objectFit: 'contain' }}
                 />

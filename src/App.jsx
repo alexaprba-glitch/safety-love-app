@@ -3,6 +3,7 @@ import twemoji from 'twemoji';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from './supabase';
 import ChatIA from './ChatIA';
+import { toastError, toastSuccess, toastInfo } from './Toast';
 import {
   Heart,
   Shield,
@@ -237,14 +238,14 @@ const BIBLE_VERSES_EN = [
 ];
 
 const MOTIVATIONAL_MESSAGES_ES = [
-  { image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600', quote: 'Eres mís fuerte de lo que crees', text: 'Cada día que te levantas y sigues adelante, estás demostrando una fortaleza que quizñs no ves en ti mismo. Confía en el proceso.' },
-  { image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600', quote: 'El sol también sale despuñs de la tormenta', text: 'Las dificultades son temporales. Asé como la lluvia limpia el aire, tus lñgrimas limpian tu alma y preparan el camino para días mís brillantes.' },
-  { image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600', quote: 'No estás solo en este camino', text: 'A veces parece que nadie entiende lo que sientes, pero hay personas que se preocupan por ti. Permitirte ser vulnerable es el primer paso para conectar.' },
-  { image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600', quote: 'Cada paso cuenta, por pequeño que sea', text: 'No subestimes el poder de las pequeñas acciones. Un paso a la vez, y un día mirarñs atrñs y verñs todo lo que has avanzado.' },
-  { image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600', quote: 'Mereces amor, respeto y felicidad', text: 'Nunca aceptes menos de lo que mereces. Tu valor no lo define lo que otros piensan de ti, sino lo que tú sabes que vales.' },
-  { image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600', quote: 'La esperanza es el ancla del alma', text: 'Cuando todo parece incierto, la esperanza te sostiene. Mantún viva la llama de la fe, porque siempre hay un nuevo amanecer esperando.' },
-  { image: 'https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=600', quote: 'Tu voz interior merece ser escuchada', text: 'Aprender a escucharte es uno de los actos mís valientes. Tus sentimientos son válidos y merecen ser expresados sin miedo.' },
-  { image: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=600', quote: 'Confía en el proceso de sanar', text: 'Sanar no es lineal. Habrñ días buenos y días difíciles, pero cada uno te acerca mís a la paz interior que buscas.' },
+  { image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&auto=format&q=75', quote: 'Eres mís fuerte de lo que crees', text: 'Cada día que te levantas y sigues adelante, estás demostrando una fortaleza que quizñs no ves en ti mismo. Confía en el proceso.' },
+  { image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&auto=format&q=75', quote: 'El sol también sale despuñs de la tormenta', text: 'Las dificultades son temporales. Asé como la lluvia limpia el aire, tus lñgrimas limpian tu alma y preparan el camino para días mís brillantes.' },
+  { image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400&auto=format&q=75', quote: 'No estás solo en este camino', text: 'A veces parece que nadie entiende lo que sientes, pero hay personas que se preocupan por ti. Permitirte ser vulnerable es el primer paso para conectar.' },
+  { image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&auto=format&q=75', quote: 'Cada paso cuenta, por pequeño que sea', text: 'No subestimes el poder de las pequeñas acciones. Un paso a la vez, y un día mirarñs atrñs y verñs todo lo que has avanzado.' },
+  { image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&auto=format&q=75', quote: 'Mereces amor, respeto y felicidad', text: 'Nunca aceptes menos de lo que mereces. Tu valor no lo define lo que otros piensan de ti, sino lo que tú sabes que vales.' },
+  { image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&auto=format&q=75', quote: 'La esperanza es el ancla del alma', text: 'Cuando todo parece incierto, la esperanza te sostiene. Mantún viva la llama de la fe, porque siempre hay un nuevo amanecer esperando.' },
+  { image: 'https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=400&auto=format&q=75', quote: 'Tu voz interior merece ser escuchada', text: 'Aprender a escucharte es uno de los actos mís valientes. Tus sentimientos son válidos y merecen ser expresados sin miedo.' },
+  { image: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400&auto=format&q=75', quote: 'Confía en el proceso de sanar', text: 'Sanar no es lineal. Habrñ días buenos y días difíciles, pero cada uno te acerca mís a la paz interior que buscas.' },
 ];
 
 const MOTIVATIONAL_MESSAGES_EN = MOTIVATIONAL_MESSAGES_ES;
@@ -717,7 +718,7 @@ export default function App() {
 
     return (
       <div className="relative w-full h-full flex items-center justify-center">
-        <img src={url} alt="avatar" className={className} />
+        <img src={url} alt="avatar" className={className} loading="lazy" decoding="async" />
         {hasEarrings && (
           <svg className="absolute w-[55%] h-[55%] top-[40%] left-1/2 -translate-x-1/2 drop-shadow-md pointer-events-none z-10" viewBox="0 0 100 100" fill={hexColor} stroke={strokeColor} strokeWidth="3">
             <circle cx="15" cy="45" r="8" />
@@ -765,6 +766,7 @@ export default function App() {
         src={src} 
         alt={emoji} 
         className={className} 
+        loading="lazy" decoding="async"
         onError={(e) => {
           e.target.style.display = 'none';
           const parent = e.target.parentElement;
@@ -1031,7 +1033,7 @@ export default function App() {
 
   const loadUserData = async (userId) => {
     try {
-      const { data: profile } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
+      const { data: profile } = await supabase.from('profiles').select('id, name, email, avatar, role, gender_theme, mascot_type, onboarding_completed').eq('id', userId).maybeSingle();
       if (profile) {
         setUserName(profile.name || profile.email || 'Usuario');
         setUserAvatar(profile.avatar || AVATARS[0]);
@@ -1039,11 +1041,11 @@ export default function App() {
         setMascotType(profile.mascot_type || 'gato');
         setRole(profile.role || 'adolescente');
       }
-      const { data: msgs } = await supabase.from('saved_messages').select('*').eq('user_id', userId);
+      const { data: msgs } = await supabase.from('saved_messages').select('id, image, quote, text, saved_at').eq('user_id', userId).limit(100);
       if (msgs) setSavedMessages(msgs);
-      const { data: verses } = await supabase.from('saved_verses').select('*').eq('user_id', userId);
+      const { data: verses } = await supabase.from('saved_verses').select('id, verse, ref, reflection, saved_at').eq('user_id', userId).limit(100);
       if (verses) setSavedVerses(verses);
-      const { data: moods } = await supabase.from('mood_entries').select('date, emoji, description, intensity').eq('user_id', userId);
+      const { data: moods } = await supabase.from('mood_entries').select('date, emoji, description, intensity').eq('user_id', userId).limit(365);
       if (moods) {
         const moodMap = {};
         moods.forEach(m => { moodMap[m.date] = { emoji: m.emoji, description: m.description, intensity: m.intensity || 2 }; });
@@ -1783,7 +1785,7 @@ export default function App() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{ backgroundColor: '#F3E2C6' }}>
         <div className="text-center mb-12">
-          <img src="/logo.png" alt="Safety Love" className="h-28 w-28 mx-auto mb-4 object-contain" />
+          <img src="/logo.webp" loading="lazy" width="48" height="48" alt="Safety Love" className="h-28 w-28 mx-auto mb-4 object-contain" />
           <h1 className="text-3xl font-black" style={{ color: '#FA9DA6' }}>Safety Love</h1>
           <p className="text-sm font-medium mt-2 text-gray-500">Elige tu estilo</p>
         </div>
@@ -2116,7 +2118,7 @@ export default function App() {
           className="text-center mb-10"
         >
           <div className="flex justify-center mb-6">
-            <img src="/logo.png" alt="Safety Love" className="h-20 w-20 object-contain" />
+            <img src="/logo.webp" loading="lazy" width="48" height="48" alt="Safety Love" className="h-20 w-20 object-contain" />
           </div>
           <h1 className="text-2xl lg:text-3xl font-bold text-gray-800 leading-tight">
             Únete a Safety Love
@@ -2455,7 +2457,7 @@ export default function App() {
 
     const steps = [
       <div key="welcome" className="text-center px-4">
-        <img src="/logo.png" alt="Safety Love" className="h-28 w-28 mx-auto mb-6 object-contain" />
+        <img src="/logo.webp" loading="lazy" width="48" height="48" alt="Safety Love" className="h-28 w-28 mx-auto mb-6 object-contain" />
         <h2 className="text-2xl font-black mb-2" style={{ color: theme.primary }}>ñBienvenido a Safety Love!</h2>
         <p className="text-sm font-medium" style={{ color: `${theme.primary}AA` }}>Tu espacio seguro para expresarte, crecer y sanar. Personalicemos tu experiencia.</p>
       </div>,
@@ -2465,7 +2467,7 @@ export default function App() {
           {AVATARS.map((a, i) => (
             <button key={i} onClick={() => setOnboardingSelectedAvatar(a)} className={`p-3 rounded-2xl transition-all cursor-pointer ${onboardingSelectedAvatar === a ? 'ring-2 shadow-lg scale-105' : 'bg-gray-50 hover:bg-gray-100'}`} style={onboardingSelectedAvatar === a ? { backgroundColor: `${theme.primary}20` } : {}}>
               <div className="w-full aspect-square rounded-xl overflow-hidden bg-white">
-                <img src={a} alt={`Avatar ${i + 1}`} className="w-full h-full object-cover" />
+                <img src={a} alt={`Avatar ${i + 1}`} className="w-full h-full object-cover" loading="lazy" decoding="async" />
               </div>
             </button>
           ))}
@@ -2475,12 +2477,12 @@ export default function App() {
         <h3 className="text-lg font-black text-center mb-4" style={{ color: theme.primary }}>Elige tu mascota</h3>
         <div className="grid grid-cols-3 gap-3">
           {['vaca', 'gato', 'oso'].map((type) => {
-            const imgs = { vaca: '/assets/dog.png', gato: '/assets/cat.png', oso: '/assets/bird.png' };
+            const imgs = { vaca: '/assets/dog.webp', gato: '/assets/cat.webp', oso: '/assets/bird.webp' };
             const names = { vaca: 'Luna 🏠', gato: 'Oliver 🏠', oso: 'Pip 🏠' };
             return (
               <button key={type} onClick={() => setMascotType(type)} className={`p-4 rounded-2xl flex flex-col items-center gap-2 transition-all cursor-pointer ${mascotType === type ? 'ring-2 shadow-lg scale-105' : 'bg-gray-50 hover:bg-gray-100'}`} style={mascotType === type ? { backgroundColor: `${theme.primary}20` } : {}}>
                 <div className="w-20 h-20 rounded-full overflow-hidden bg-white border-2 border-gray-100 shadow-sm">
-                  <img src={imgs[type]} alt={names[type]} className="w-full h-full object-cover" />
+                  <img src={imgs[type]} alt={names[type]} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                 </div>
                 <span className="text-xs font-bold" style={{ color: theme.primary }}>{names[type]}</span>
               </button>
@@ -2748,7 +2750,7 @@ export default function App() {
       <div className="min-h-screen flex flex-col items-center justify-center p-4 pl-20 lg:p-8 lg:pl-24 xl:p-10 xl:pl-28" style={{ backgroundColor: '#F0FDF4' }}>
         <div className="w-full max-w-lg lg:max-w-2xl xl:max-w-3xl">
           <div className="flex items-center justify-between mb-4 lg:mb-6 xl:mb-8">
-            <img src="/logo.png" alt="Safety Love" className="h-20 w-20 lg:h-24 lg:w-24 xl:h-28 xl:w-28 object-contain" />
+            <img src="/logo.webp" loading="lazy" width="48" height="48" alt="Safety Love" className="h-20 w-20 lg:h-24 lg:w-24 xl:h-28 xl:w-28 object-contain" />
             <div className="flex items-center gap-3 lg:gap-4 xl:gap-5">
               <div className="w-11 h-11 lg:w-14 lg:h-14 xl:w-16 xl:h-16 rounded-full overflow-hidden border-2 shadow-sm flex-shrink-0 cursor-pointer" style={{ borderColor: theme.accent }} onClick={() => goTo('profile')}>
                 <UserAvatar url={userAvatar} />
@@ -2756,7 +2758,7 @@ export default function App() {
             </div>
           </div>
           <div className="w-full bg-white rounded-[2rem] lg:rounded-[2.5rem] xl:rounded-[3rem] shadow-xl overflow-hidden">
-            <img src={msg.image} alt="" className="w-full h-48 lg:h-64 xl:h-80 object-cover" />
+            <img src={msg.image} alt="" className="w-full h-48 lg:h-64 xl:h-80 object-cover" loading="lazy" decoding="async" />
             <div className="p-6 lg:p-8 xl:p-10">
               <h2 className="text-xl lg:text-2xl xl:text-3xl font-black text-gray-800 mb-2 lg:mb-3 xl:mb-4">{msg.quote}</h2>
               <p className="text-sm lg:text-base xl:text-lg text-gray-500 leading-relaxed">{msg.text}</p>
@@ -2802,7 +2804,7 @@ export default function App() {
       <div className="min-h-screen flex flex-col items-center justify-center p-4 pl-20 lg:p-8 lg:pl-24 xl:p-10 xl:pl-28" style={{ backgroundColor: '#FED7AA' }}>
         <div className="w-full max-w-lg lg:max-w-2xl xl:max-w-3xl">
           <div className="flex items-center justify-between mb-4 lg:mb-6 xl:mb-8">
-            <img src="/logo.png" alt="Safety Love" className="h-32 w-32 lg:h-36 lg:w-36 xl:h-40 xl:w-40 object-contain drop-shadow-lg" />
+            <img src="/logo.webp" loading="lazy" width="48" height="48" alt="Safety Love" className="h-32 w-32 lg:h-36 lg:w-36 xl:h-40 xl:w-40 object-contain drop-shadow-lg" />
             <div className="flex items-center gap-3 lg:gap-4 xl:gap-5">
               <div className="w-11 h-11 lg:w-14 lg:h-14 xl:w-16 xl:h-16 rounded-full overflow-hidden border-2 shadow-sm flex-shrink-0 cursor-pointer" style={{ borderColor: theme.accent }} onClick={() => goTo('profile')}>
                 <UserAvatar url={userAvatar} />
@@ -2902,7 +2904,7 @@ export default function App() {
       <div className="min-h-screen flex flex-col items-center justify-center p-4 pl-20 lg:p-8 lg:pl-24 xl:p-10 xl:pl-28" style={{ backgroundColor: theme.bg }}>
         <div className="w-full max-w-lg lg:max-w-2xl xl:max-w-3xl">
           <div className="flex items-center justify-between mb-4 lg:mb-6 xl:mb-8">
-            <img src="/logo.png" alt="Safety Love" className="h-20 w-20 lg:h-24 lg:w-24 xl:h-28 xl:w-28 object-contain" />
+            <img src="/logo.webp" loading="lazy" width="48" height="48" alt="Safety Love" className="h-20 w-20 lg:h-24 lg:w-24 xl:h-28 xl:w-28 object-contain" />
             <div className="flex items-center gap-3 lg:gap-4 xl:gap-5">
               <div className="w-11 h-11 lg:w-14 lg:h-14 xl:w-16 xl:h-16 rounded-full overflow-hidden border-2 shadow-sm flex-shrink-0 cursor-pointer" style={{ borderColor: theme.accent }} onClick={() => goTo('profile')}>
                 <UserAvatar url={userAvatar} />
@@ -2943,7 +2945,7 @@ export default function App() {
               chatMessages.map((msg) => (
                 <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[85%] p-4 lg:p-5 xl:p-6 rounded-2xl lg:rounded-3xl shadow-sm ${msg.role === 'user' ? 'rounded-tr-sm' : 'rounded-tl-sm'}`} style={{ backgroundColor: msg.role === 'user' ? theme.accent : '#F3F4F6' }}>
-                    {msg.file && <img src={msg.file} alt="compartido" className="w-full rounded-xl mb-2 max-h-48 lg:max-h-64 xl:max-h-80 object-cover" />}
+                    {msg.file && <img src={msg.file} alt="compartido" className="w-full rounded-xl mb-2 max-h-48 lg:max-h-64 xl:max-h-80 object-cover" loading="lazy" decoding="async" />}
                     <p className={`text-sm lg:text-base xl:text-lg leading-relaxed ${msg.role === 'user' ? 'text-white' : 'text-gray-700'}`}>{msg.content}</p>
                     <p className={`text-[10px] lg:text-xs xl:text-sm mt-1.5 ${msg.role === 'user' ? 'text-white/60' : 'text-gray-400'}`}>{msg.time}</p>
                   </div>

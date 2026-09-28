@@ -1,20 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, Video, ChevronRight, Calendar, Clock, User, Shield, Lock, XCircle, AlertTriangle } from 'lucide-react';
+import { Phone, Video, ChevronRight, Calendar, Clock, User, Shield, Lock, XCircle, AlertTriangle, CalendarX2 } from 'lucide-react';
+import { getSessionsForStudent, normalizeName, STUDENT_SESSIONS_EVENT } from './studentSessions';
 
-const PENDING_SESSIONS = [
-  { psychologist: 'Dra. Carolina Reyes', type: 'Seguimiento emocional', date: '25 Ago 2026', time: '10:00 AM', status: 'pendiente', dayLabel: '25', monthLabel: 'AGO', color: '#3B82F6', bg: 'rgba(59,130,246,0.1)' },
-  { psychologist: 'Dra. Carolina Reyes', type: 'Sesión de ansiedad', date: '29 Ago 2026', time: '11:00 AM', status: 'pendiente', dayLabel: '29', monthLabel: 'AGO', color: '#8B5CF6', bg: 'rgba(139,92,246,0.1)' },
-  { psychologist: 'Dra. Carolina Reyes', type: 'Evaluación mensual', date: '02 Sep 2026', time: '10:00 AM', status: 'pendiente', dayLabel: '02', monthLabel: 'SEP', color: '#F97316', bg: 'rgba(249,115,22,0.1)' },
+const TYPE_COLORS = [
+  { color: '#3B82F6', bg: 'rgba(59,130,246,0.1)' },
+  { color: '#8B5CF6', bg: 'rgba(139,92,246,0.1)' },
+  { color: '#F97316', bg: 'rgba(249,115,22,0.1)' },
+  { color: '#10B981', bg: 'rgba(16,185,129,0.1)' },
 ];
 
-const PAST_SESSIONS = [
-  { psychologist: 'Dra. Carolina Reyes', type: 'Sesión inicial', date: '18 Ago 2026', time: '10:00 AM', status: 'completada', dayLabel: '18', monthLabel: 'AGO' },
-  { psychologist: 'Dra. Carolina Reyes', type: 'Seguimiento emocional', date: '11 Ago 2026', time: '10:00 AM', status: 'completada', dayLabel: '11', monthLabel: 'AGO' },
-];
+const MESES_CORTO = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
 
-export default function PsicologoSection({ darkMode = false }) {
+function parseSessionDate(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(`${dateStr}T12:00:00`);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function startOfToday() {
+  const t = new Date();
+  t.setHours(0, 0, 0, 0);
+  return t;
+}
+
+function describeSession(s) {
+  const d = parseSessionDate(s.date);
+  return {
+    ...s,
+    _date: d,
+    dayLabel: d ? String(d.getDate()).padStart(2, '0') : '--',
+    monthLabel: d ? MESES_CORTO[d.getMonth()] : '---',
+    weekday: d ? d.toLocaleDateString('es-ES', { weekday: 'long' }).replace(/^\w/, (c) => c.toUpperCase()) : '',
+    dateDisplay: d ? d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : (s.date || ''),
+  };
+}
+
+export default function PsicologoSection({ darkMode = false, userName = '' }) {
   const dm = darkMode;
   const [cancelledSessions, setCancelledSessions] = useState([]);
+  // Sesiones reales agendadas por el psicólogo para este estudiante
+  const [mySessions, setMySessions] = useState(() => getSessionsForStudent(userName));
 
   useEffect(() => {
     try {
@@ -22,6 +47,35 @@ export default function PsicologoSection({ darkMode = false }) {
       setCancelledSessions(stored);
     } catch {}
   }, []);
+
+  useEffect(() => {
+    const reload = () => setMySessions(getSessionsForStudent(userName));
+    reload();
+    window.addEventListener(STUDENT_SESSIONS_EVENT, reload);
+    window.addEventListener('storage', reload);
+    return () => {
+      window.removeEventListener(STUDENT_SESSIONS_EVENT, reload);
+      window.removeEventListener('storage', reload);
+    };
+  }, [userName]);
+
+  const myName = normalizeName(userName);
+  const visibleCancelled = myName
+    ? cancelledSessions.filter((cs) => normalizeName(cs.name) === myName)
+    : cancelledSessions;
+
+  const today = startOfToday();
+  const upcoming = mySessions
+    .map(describeSession)
+    .filter((s) => s._date && s._date >= today)
+    .sort((a, b) => a._date - b._date);
+  const past = mySessions
+    .map(describeSession)
+    .filter((s) => !s._date || s._date < today)
+    .sort((a, b) => (b._date || 0) - (a._date || 0));
+  const nextSession = upcoming[0] || null;
+  const pendingSessions = upcoming.slice(1);
+  const hasSessions = upcoming.length > 0 || past.length > 0;
 
   const dismissCancelled = (id) => {
     const updated = cancelledSessions.filter(s => s.id !== id);
@@ -65,9 +119,9 @@ export default function PsicologoSection({ darkMode = false }) {
           </header>
 
           {/* ═══ CANCELLED SESSION NOTIFICATIONS ═══ */}
-          {cancelledSessions.length > 0 && (
+          {visibleCancelled.length > 0 && (
             <div style={{ marginBottom: '24px' }}>
-              {cancelledSessions.map((cs) => (
+              {visibleCancelled.map((cs) => (
                 <div key={cs.id} style={{
                   borderRadius: '16px', border: `1px solid ${dm ? 'rgba(239,68,68,0.2)' : 'rgba(239,68,68,0.15)'}`,
                   padding: '18px 20px', display: 'flex', alignItems: 'flex-start', gap: '16px',
@@ -116,10 +170,35 @@ export default function PsicologoSection({ darkMode = false }) {
               @media (max-width: 1024px) { .psicologo-grid { grid-template-columns: 1fr !important; } }
             `}</style>
 
-            {/* ═══ COLUMNA IZQUIERDA ═══ */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+            {/* ═══ ESTADO VACÍO (sin sesiones agendadas) · a la derecha de Consejo/Contacto ═══ */}
+            {!hasSessions && (
+              <div style={{
+                borderRadius: '24px', padding: '56px 32px', textAlign: 'center',
+                background: cardBg, border: `2px dashed ${dm ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                boxShadow: '0 8px 30px rgba(15,23,42,0.04)',
+                order: 1,
+              }}>
+                <div style={{
+                  width: '72px', height: '72px', borderRadius: '22px', margin: '0 auto 20px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: dm ? 'rgba(236,72,153,0.1)' : '#FFF5FA',
+                }}>
+                  <CalendarX2 size={32} style={{ color: '#EC4899' }} />
+                </div>
+                <h2 style={{ fontSize: '22px', fontWeight: 700, color: textPrimary, margin: '0 0 8px' }}>
+                  Aún no tienes sesiones programadas
+                </h2>
+                <p style={{ fontSize: '15px', fontWeight: 500, color: textSecondary, margin: 0, lineHeight: 1.6 }}>
+                  Cuando tu psicólogo agende una sesión contigo desde su agenda,<br />aparecerá aquí automáticamente.
+                </p>
+              </div>
+            )}
 
-              {/* ── PRÓXIMA SESIÓN ── */}
+            {/* ═══ COLUMNA IZQUIERDA (oculta en estado vacío para ceder su celda) ═══ */}
+            <div style={{ display: hasSessions ? 'flex' : 'none', flexDirection: 'column', gap: '28px' }}>
+
+              {/* ── PRÓXIMA SESIÓN (solo si el psicólogo agendó) ── */}
+              {nextSession && (
               <div style={{
                 borderRadius: '24px', padding: '32px',
                 background: cardBg, border: `1.5px solid ${dm ? 'rgba(233,213,255,0.15)' : 'rgba(244,63,158,0.12)'}`,
@@ -145,8 +224,8 @@ export default function PsicologoSection({ darkMode = false }) {
                       <User size={24} style={{ color: '#EC4899' }} strokeWidth={2} />
                     </div>
                     <div>
-                      <h3 style={{ fontSize: '24px', fontWeight: 700, color: textPrimary, margin: '0 0 6px' }}>Dra. Carolina Reyes</h3>
-                      <p style={{ fontSize: '16px', fontWeight: 500, color: textSecondary, margin: 0 }}>Sesión de seguimiento emocional</p>
+                      <h3 style={{ fontSize: '24px', fontWeight: 700, color: textPrimary, margin: '0 0 6px' }}>Tu psicólogo</h3>
+                      <p style={{ fontSize: '16px', fontWeight: 500, color: textSecondary, margin: 0 }}>{nextSession.type || 'Sesión programada'}</p>
                     </div>
                   </div>
                   <div style={{
@@ -158,14 +237,14 @@ export default function PsicologoSection({ darkMode = false }) {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <Calendar size={18} style={{ color: '#EC4899' }} />
                       <div>
-                        <div style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#EC4899' }}>Viernes</div>
-                        <div style={{ fontSize: '14px', fontWeight: 600, color: textSecondary, marginTop: '2px' }}>29 Ago</div>
+                        <div style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#EC4899' }}>{nextSession.weekday}</div>
+                        <div style={{ fontSize: '14px', fontWeight: 600, color: textSecondary, marginTop: '2px' }}>{nextSession.dateDisplay}</div>
                       </div>
                     </div>
                     <div style={{ width: '1px', height: '36px', background: dm ? 'rgba(255,255,255,0.08)' : '#E2E8F0' }} />
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <Clock size={18} style={{ color: '#EC4899' }} />
-                      <div style={{ fontSize: '20px', fontWeight: 800, color: textPrimary }}>10:00 AM</div>
+                      <div style={{ fontSize: '20px', fontWeight: 800, color: textPrimary }}>{nextSession.time}</div>
                     </div>
                   </div>
                 </div>
@@ -185,13 +264,17 @@ export default function PsicologoSection({ darkMode = false }) {
                   Unirse a la sesión
                 </button>
               </div>
+              )}
 
               {/* ── SESIONES PENDIENTES ── */}
+              {pendingSessions.length > 0 && (
               <div>
                 <h2 style={{ fontSize: '24px', fontWeight: 700, color: textPrimary, margin: '0 0 22px' }}>Sesiones pendientes</h2>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  {PENDING_SESSIONS.map((session, idx) => (
-                    <div key={idx} style={{
+                  {pendingSessions.map((session, idx) => {
+                    const palette = TYPE_COLORS[idx % TYPE_COLORS.length];
+                    return (
+                    <div key={session.id ?? idx} style={{
                       borderRadius: '20px', padding: '18px 20px',
                       display: 'flex', alignItems: 'center', gap: '18px',
                       background: cardBg, border: `1px solid ${cardBorder}`,
@@ -204,18 +287,18 @@ export default function PsicologoSection({ darkMode = false }) {
                       <div style={{
                         width: '68px', height: '68px', borderRadius: '18px',
                         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                        background: session.bg, color: session.color,
+                        background: palette.bg, color: palette.color,
                         fontWeight: 700, flexShrink: 0
                       }}>
                         <span style={{ fontSize: '26px', lineHeight: 1 }}>{session.dayLabel}</span>
                         <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', marginTop: '2px', opacity: 0.8 }}>{session.monthLabel}</span>
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: '17px', fontWeight: 700, color: textPrimary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{session.psychologist}</div>
-                        <div style={{ fontSize: '14px', fontWeight: 500, color: textSecondary, marginTop: '4px' }}>{session.type}</div>
+                        <div style={{ fontSize: '17px', fontWeight: 700, color: textPrimary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{session.type || 'Sesión programada'}</div>
+                        <div style={{ fontSize: '14px', fontWeight: 500, color: textSecondary, marginTop: '4px' }}>{session.weekday} · {session.dateDisplay}</div>
                       </div>
                       <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                        <div style={{ fontSize: '15px', fontWeight: 600, color: dm ? '#CBD5E1' : '#334155' }}>{session.date}</div>
+                        <div style={{ fontSize: '15px', fontWeight: 600, color: dm ? '#CBD5E1' : '#334155' }}>{session.dateDisplay}</div>
                         <div style={{ fontSize: '13px', fontWeight: 500, color: textSecondary, marginTop: '2px' }}>{session.time}</div>
                       </div>
                       <div style={{ flexShrink: 0 }}>
@@ -231,15 +314,18 @@ export default function PsicologoSection({ darkMode = false }) {
                       </div>
                       <ChevronRight size={18} style={{ color: dm ? '#334155' : '#CBD5E1', flexShrink: 0 }} />
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
+              )}
             </div>
 
             {/* ═══ COLUMNA DERECHA ═══ */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
-              {/* ── SESIONES PASADAS ── */}
+              {/* ── SESIONES PASADAS (solo historial real) ── */}
+              {past.length > 0 && (
               <div style={{
                 borderRadius: '22px', padding: '26px',
                 background: cardBg, border: `1px solid ${cardBorder}`,
@@ -259,8 +345,8 @@ export default function PsicologoSection({ darkMode = false }) {
                   </button>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                  {PAST_SESSIONS.map((session, idx) => (
-                    <div key={idx} style={{
+                  {past.map((session, idx) => (
+                    <div key={session.id ?? idx} style={{
                       borderRadius: '18px', padding: '16px 18px',
                       display: 'flex', alignItems: 'center', gap: '16px',
                       background: dm ? 'rgba(255,255,255,0.02)' : '#F8FAFC',
@@ -280,11 +366,11 @@ export default function PsicologoSection({ darkMode = false }) {
                         <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', marginTop: '2px', opacity: 0.8 }}>{session.monthLabel}</span>
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: '15px', fontWeight: 600, color: dm ? '#94A3B8' : '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{session.psychologist}</div>
-                        <div style={{ fontSize: '13px', fontWeight: 500, color: dm ? '#475569' : '#94A3B8', marginTop: '3px' }}>{session.type}</div>
+                        <div style={{ fontSize: '15px', fontWeight: 600, color: dm ? '#94A3B8' : '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{session.type || 'Sesión'}</div>
+                        <div style={{ fontSize: '13px', fontWeight: 500, color: dm ? '#475569' : '#94A3B8', marginTop: '3px' }}>{session.weekday} · {session.dateDisplay}</div>
                       </div>
                       <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                        <div style={{ fontSize: '13px', fontWeight: 600, color: dm ? '#475569' : '#94A3B8' }}>{session.date}</div>
+                        <div style={{ fontSize: '13px', fontWeight: 600, color: dm ? '#475569' : '#94A3B8' }}>{session.dateDisplay}</div>
                         <div style={{ fontSize: '12px', fontWeight: 500, color: dm ? '#334155' : '#CBD5E1', marginTop: '2px' }}>{session.time}</div>
                       </div>
                       <span style={{
@@ -300,6 +386,7 @@ export default function PsicologoSection({ darkMode = false }) {
                   ))}
                 </div>
               </div>
+              )}
 
               {/* ── CONSEJO ── */}
               <div style={{

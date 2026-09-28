@@ -11,7 +11,7 @@ const SIZES = {
 
 const OUTFITS = {
   bow: { color: '#F472B6', label: 'Lazo' },
-  cap: { color: '#60A5FA', label: 'Boina' },
+  cap: { color: '#2F3646', label: 'Boina' },
   glasses: { color: '#172033', label: 'Lentes' },
   flower: { color: '#F472B6', label: 'Flor' },
 };
@@ -41,14 +41,23 @@ function AwakeEyes({ cx1, cy1, cx2, cy2 }) {
 function BowOutfit({ hx, hy }) {
   return (
     <g transform={`translate(${hx}, ${hy - 18})`}>
-      <ellipse cx="-14" cy="0" rx="12" ry="8" fill="#F472B6" opacity="0.9" />
-      <ellipse cx="14" cy="0" rx="12" ry="8" fill="#F472B6" opacity="0.9" />
-      <ellipse cx="-10" cy="-2" rx="6" ry="5" fill="#F9A8D4" opacity="0.6" />
-      <ellipse cx="10" cy="-2" rx="6" ry="5" fill="#F9A8D4" opacity="0.6" />
-      <circle cx="0" cy="0" r="5" fill="#EC4899" />
-      <circle cx="0" cy="0" r="2.5" fill="#F9A8D4" opacity="0.7" />
-      <path d="M0 5 Q-3 10 -1 14" stroke="#EC4899" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.6" />
-      <path d="M0 5 Q3 10 1 14" stroke="#EC4899" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.6" />
+      {/* Colitas traseras con corte en V */}
+      <path d="M-4 4 L-16 20 L-10 21 L-12 27 L0 12 Z" fill="#F472B6" stroke="#DB2777" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M4 4 L16 20 L10 21 L12 27 L0 12 Z" fill="#F472B6" stroke="#DB2777" strokeWidth="1.5" strokeLinejoin="round" />
+      {/* Moños con contorno definido */}
+      <ellipse cx="-15" cy="-1" rx="14" ry="10" fill="#F472B6" stroke="#DB2777" strokeWidth="2" />
+      <ellipse cx="15" cy="-1" rx="14" ry="10" fill="#F472B6" stroke="#DB2777" strokeWidth="2" />
+      {/* Sombreado interior */}
+      <ellipse cx="-15" cy="1" rx="8" ry="5" fill="#DB2777" opacity="0.35" />
+      <ellipse cx="15" cy="1" rx="8" ry="5" fill="#DB2777" opacity="0.35" />
+      {/* Brillos */}
+      <ellipse cx="-19" cy="-5" rx="5" ry="3" fill="#FBCFE8" opacity="0.85" transform="rotate(-18, -19, -5)" />
+      <ellipse cx="19" cy="-5" rx="5" ry="3" fill="#FBCFE8" opacity="0.85" transform="rotate(18, 19, -5)" />
+      {/* Nudo central tipo joya */}
+      <circle cx="0" cy="0" r="7" fill="#DB2777" />
+      <circle cx="0" cy="0" r="7" fill="none" stroke="#9D174D" strokeWidth="1.5" />
+      <circle cx="0" cy="0" r="3.5" fill="#F9A8D4" />
+      <circle cx="-1.5" cy="-1.5" r="1.3" fill="#FFFFFF" opacity="0.9" />
     </g>
   );
 }
@@ -56,11 +65,22 @@ function BowOutfit({ hx, hy }) {
 function CapOutfit({ hx, hy }) {
   return (
     <g>
-      <ellipse cx={hx} cy={hy - 16} rx="38" ry="10" fill="#60A5FA" opacity="0.85" />
-      <path d={`M${hx - 38} ${hy - 16} Q${hx - 38} ${hy - 46} ${hx} ${hy - 50} Q${hx + 38} ${hy - 46} ${hx + 38} ${hy - 16}`} fill="#60A5FA" opacity="0.85" />
-      <path d={`M${hx - 30} ${hy - 22} Q${hx - 30} ${hy - 40} ${hx} ${hy - 42} Q${hx + 30} ${hy - 40} ${hx + 30} ${hy - 22}`} fill="#93C5FD" opacity="0.35" />
-      <ellipse cx={hx + 20} cy={hy - 18} rx="20" ry="5" fill="#3B82F6" opacity="0.55" />
-      <circle cx={hx} cy={hy - 50} r="4" fill="#FFFFFF" opacity="0.8" />
+      {/* Banda inferior (ajuste a la cabeza) */}
+      <ellipse cx={hx} cy={hy - 16} rx="38" ry="10" fill="#1B2233" />
+      <ellipse cx={hx} cy={hy - 17} rx="38" ry="8" fill="#2B3245" />
+      {/* Cuerpo de la boina profesional */}
+      <path d={`M${hx - 38} ${hy - 16} Q${hx - 40} ${hy - 48} ${hx} ${hy - 52} Q${hx + 40} ${hy - 48} ${hx + 38} ${hy - 16}`} fill="#2F3646" />
+      {/* Reflejo superior elegante */}
+      <path d={`M${hx - 28} ${hy - 24} Q${hx - 26} ${hy - 42} ${hx} ${hy - 44} Q${hx - 14} ${hy - 40} ${hx - 16} ${hy - 26}`} fill="#4B5568" opacity="0.45" />
+      {/* Pliegue lateral */}
+      <ellipse cx={hx + 22} cy={hy - 20} rx="16" ry="4" fill="#1B2233" opacity="0.5" />
+      {/* Rabito superior */}
+      <line x1={hx} y1={hy - 52} x2={hx} y2={hy - 58} stroke="#2F3646" strokeWidth="3" strokeLinecap="round" />
+      <circle cx={hx} cy={hy - 59} r="3" fill="#2F3646" />
+      {/* Insignia dorada profesional */}
+      <circle cx={hx - 22} cy={hy - 26} r="6.5" fill="#EAB308" />
+      <circle cx={hx - 22} cy={hy - 26} r="6.5" fill="none" stroke="#B45309" strokeWidth="1.5" />
+      <circle cx={hx - 22} cy={hy - 26} r="2.4" fill="#FEF3C7" />
     </g>
   );
 }
@@ -105,9 +125,13 @@ const OUTFIT_COMPONENTS = {
   flower: FlowerOutfit,
 };
 
-function OutfitOverlay({ outfit, headX = 100, headY = 88 }) {
+function OutfitOverlay({ outfit, headX = 100, headY = 88, chestX = null, chestY = null }) {
   if (!outfit || !OUTFIT_COMPONENTS[outfit]) return null;
   const Comp = OUTFIT_COMPONENTS[outfit];
+  // El lazo va en el pecho, no en la cabeza (compensa el offset interno del BowOutfit)
+  if (outfit === 'bow') {
+    return <Comp hx={chestX ?? headX} hy={(chestY ?? headY) + 18} />;
+  }
   return <Comp hx={headX} hy={headY} />;
 }
 
@@ -182,8 +206,8 @@ function CatMascot({ colors, sleeping, outfit }) {
         <path d="M80 92 Q100 110 120 92" stroke="#172033" strokeWidth="2.4" strokeLinecap="round" fill="none" />
       )}
 
-      {/* ═══ OUTFIT (despues de cabeza) ═══ */}
-      <OutfitOverlay outfit={outfit} headX={100} headY={68} />
+      {/* ═══ OUTFIT (lazo al pecho, resto a la cabeza) ═══ */}
+      <OutfitOverlay outfit={outfit} headX={100} headY={68} chestX={100} chestY={132} />
     </svg>
   );
 }
@@ -284,8 +308,8 @@ function BunnyMascot({ colors, sleeping, outfit }) {
       <ellipse cx="64" cy="108" rx="7" ry="4" fill="#FFB6C8" opacity="0.45" />
       <ellipse cx="136" cy="108" rx="7" ry="4" fill="#FFB6C8" opacity="0.45" />
 
-      {/* ═══ OUTFIT (despues de cabeza) ═══ */}
-      <OutfitOverlay outfit={outfit} headX={100} headY={80} />
+      {/* ═══ OUTFIT (lazo al pecho, resto a la cabeza) ═══ */}
+      <OutfitOverlay outfit={outfit} headX={100} headY={80} chestX={100} chestY={148} />
     </svg>
   );
 }
@@ -318,7 +342,7 @@ function BearMascot({ colors, sleeping, outfit }) {
       ) : (
         <path d="M94 104 Q100 108 106 104" stroke="#172033" strokeWidth="1.8" strokeLinecap="round" fill="none" />
       )}
-      <OutfitOverlay outfit={outfit} headX={100} headY={88} />
+      <OutfitOverlay outfit={outfit} headX={100} headY={88} chestX={100} chestY={142} />
       <ellipse cx="70" cy="100" rx="8" ry="5" fill={colors.accent} opacity="0.5" />
       <ellipse cx="130" cy="100" rx="8" ry="5" fill={colors.accent} opacity="0.5" />
     </svg>
@@ -436,8 +460,8 @@ function FoxMascot({ colors, sleeping, outfit }) {
       <ellipse cx="56" cy="92" rx="6" ry="3.5" fill="#FFB6C8" opacity="0.4" />
       <ellipse cx="124" cy="92" rx="6" ry="3.5" fill="#FFB6C8" opacity="0.4" />
 
-      {/* ═══ OUTFIT (despues de cabeza) ═══ */}
-      <OutfitOverlay outfit={outfit} headX={90} headY={86} />
+      {/* ═══ OUTFIT (lazo al pecho, resto a la cabeza) ═══ */}
+      <OutfitOverlay outfit={outfit} headX={90} headY={86} chestX={90} chestY={144} />
     </svg>
   );
 }
@@ -516,8 +540,8 @@ function PandaMascot({ colors, sleeping, outfit }) {
       <ellipse cx="60" cy="96" rx="7" ry="4" fill="#FFB6C8" opacity="0.4" />
       <ellipse cx="140" cy="96" rx="7" ry="4" fill="#FFB6C8" opacity="0.4" />
 
-      {/* ═══ OUTFIT (despues de cabeza) ═══ */}
-      <OutfitOverlay outfit={outfit} headX={100} headY={86} />
+      {/* ═══ OUTFIT (lazo al pecho, resto a la cabeza) ═══ */}
+      <OutfitOverlay outfit={outfit} headX={100} headY={86} chestX={100} chestY={142} />
     </svg>
   );
 }
@@ -597,8 +621,8 @@ function KoalaMascot({ colors, sleeping, outfit }) {
       <ellipse cx="62" cy="96" rx="7" ry="4" fill="#FFB6C8" opacity="0.38" />
       <ellipse cx="138" cy="96" rx="7" ry="4" fill="#FFB6C8" opacity="0.38" />
 
-      {/* ═══ OUTFIT (despues de cabeza) ═══ */}
-      <OutfitOverlay outfit={outfit} headX={100} headY={84} />
+      {/* ═══ OUTFIT (lazo al pecho, resto a la cabeza) ═══ */}
+      <OutfitOverlay outfit={outfit} headX={100} headY={84} chestX={100} chestY={144} />
     </svg>
   );
 }
@@ -661,8 +685,8 @@ function PenguinMascot({ colors, sleeping, outfit }) {
       <ellipse cx="68" cy="90" rx="6" ry="3.5" fill="#FFB6C8" opacity="0.4" />
       <ellipse cx="132" cy="90" rx="6" ry="3.5" fill="#FFB6C8" opacity="0.4" />
 
-      {/* ═══ OUTFIT (despues de cabeza) ═══ */}
-      <OutfitOverlay outfit={outfit} headX={100} headY={78} />
+      {/* ═══ OUTFIT (lazo al pecho, resto a la cabeza) ═══ */}
+      <OutfitOverlay outfit={outfit} headX={100} headY={78} chestX={100} chestY={138} />
     </svg>
   );
 }
@@ -688,7 +712,7 @@ function GenericMascot({ colors, emoji, sleeping, outfit }) {
       ) : (
         <path d="M95 103 Q100 107 105 103" stroke="#172033" strokeWidth="1.8" strokeLinecap="round" fill="none" />
       )}
-      <OutfitOverlay outfit={outfit} headX={100} headY={88} />
+      <OutfitOverlay outfit={outfit} headX={100} headY={88} chestX={100} chestY={142} />
       <ellipse cx="70" cy="98" rx="7" ry="4" fill={colors.accent} opacity="0.5" />
       <ellipse cx="130" cy="98" rx="7" ry="4" fill={colors.accent} opacity="0.5" />
       <text x="100" y="145" textAnchor="middle" fontSize="40" fill={colors.secondary}>{emoji}</text>

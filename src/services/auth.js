@@ -62,7 +62,7 @@ export async function getUser() {
 export async function getProfile(userId) {
   const { data, error } = await supabase
     .from('profiles')
-    .select('*')
+    .select('id, name, email, avatar, role, gender_theme, mascot_type, specialty, onboarding_completed')
     .eq('id', userId)
     .maybeSingle();
   if (error) throw error;
@@ -74,7 +74,7 @@ export async function updateProfile(userId, updates) {
     .from('profiles')
     .update({ ...updates, updated_at: new Date().toISOString() })
     .eq('id', userId)
-    .select()
+    .select('id, name, email, avatar, role, gender_theme, mascot_type, specialty')
     .single();
   if (error) throw error;
   return data;

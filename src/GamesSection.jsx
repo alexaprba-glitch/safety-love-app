@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, Trophy, Star, Clock, Users, Gamepad2, Flag, Brain, Heart, Puzzle, Sparkles, ArrowRight, Lock } from 'lucide-react';
 import GreenRedFlagGame from './GreenRedFlagGame.jsx';
 import QuizEmocional from './QuizEmocional.jsx';
 import MemoriaSentimientos from './MemoriaSentimientos.jsx';
+import { loadGameStats } from './gameStats';
 
 const GAMES = [
   {
@@ -47,23 +48,37 @@ const COMING_SOON = [
   { icon: Users, title: 'Simulador de Conversaciones', desc: 'Practica conversaciones difíciles con empatía.' },
 ];
 
-export default function GamesSection({ darkMode = false }) {
+export default function GamesSection({ darkMode = false, onToast = null }) {
   const dm = darkMode;
   const [activeGame, setActiveGame] = useState(null);
-  const [stats, setStats] = useState(() => {
-    const saved = localStorage.getItem('safetyLove_gameStats');
-    return saved ? JSON.parse(saved) : { played: 0, won: 0, stars: 0 };
-  });
+  // Estrellas del mercado ganadas en esta visita al juego (para avisar al salir)
+  const sessionStarsRef = useRef(0);
+  useEffect(() => {
+    const onEarned = (e) => { sessionStarsRef.current += (e.detail || 2); };
+    window.addEventListener('pet-stars-earned', onEarned);
+    return () => window.removeEventListener('pet-stars-earned', onEarned);
+  }, []);
+  const [stats, setStats] = useState(() => loadGameStats());
 
   const refreshStats = () => {
-    const saved = localStorage.getItem('safetyLove_gameStats');
-    setStats(saved ? JSON.parse(saved) : { played: 0, won: 0, stars: 0 });
+    setStats(loadGameStats());
+  };
+
+  // Al salir del juego: avisa las estrellas ganadas (ya sumadas al mercado)
+  const exitGame = () => {
+    const earned = sessionStarsRef.current;
+    sessionStarsRef.current = 0;
+    setActiveGame(null);
+    refreshStats();
+    if (earned > 0 && onToast) {
+      onToast(`¡Ganaste ${earned} ⭐ por jugar! Ya están en tu mercado 🏪`);
+    }
   };
 
   if (activeGame === 'green-red-flag') {
     return (
       <div style={{ position: 'relative' }}>
-        <GreenRedFlagGame darkMode={darkMode} onBack={() => setActiveGame(null)} />
+        <GreenRedFlagGame darkMode={darkMode} onBack={exitGame} />
       </div>
     );
   }
@@ -71,7 +86,7 @@ export default function GamesSection({ darkMode = false }) {
   if (activeGame === 'quiz-emocional') {
     return (
       <div style={{ position: 'relative' }}>
-        <QuizEmocional darkMode={darkMode} onBack={() => setActiveGame(null)} />
+        <QuizEmocional darkMode={darkMode} onBack={exitGame} />
       </div>
     );
   }
@@ -79,7 +94,7 @@ export default function GamesSection({ darkMode = false }) {
   if (activeGame === 'memoria') {
     return (
       <div style={{ position: 'relative' }}>
-        <MemoriaSentimientos darkMode={darkMode} onBack={() => setActiveGame(null)} />
+        <MemoriaSentimientos darkMode={darkMode} onBack={exitGame} />
       </div>
     );
   }

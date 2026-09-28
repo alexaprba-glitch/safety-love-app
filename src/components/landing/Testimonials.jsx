@@ -42,7 +42,7 @@ export default function Testimonials() {
           {testimonials.map((item) => (
             <article key={item.name} className="rounded-[1.5rem] border border-pink-50 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
               <div className="flex items-center gap-3">
-                <img src={item.avatar} alt={item.name} className="h-12 w-12 rounded-full object-cover" />
+                <img src={item.avatar} alt={item.name} className="h-12 w-12 rounded-full object-cover" loading="lazy" decoding="async" />
                 <div>
                   <p className="font-extrabold text-slate-800">{item.name}</p>
                   <div className="flex gap-1 text-amber-400">

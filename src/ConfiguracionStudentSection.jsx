@@ -375,27 +375,21 @@ export default function ConfiguracionStudentSection({ darkMode: darkModeProp, on
     background: cardBg,
     border: `1px solid ${cardBorder}`,
     borderRadius: '22px',
-    padding: '28px',
+    padding: 'clamp(16px, 3vw, 28px)',
     display: 'flex', flexDirection: 'column'
   };
 
   return (
     <div style={{ minHeight: '100%', height: '100%', overflowY: 'auto', fontFamily: "'Inter', sans-serif", background: bg, color: textPrimary }} className="custom-scrollbar">
-      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '40px 48px' }}>
+      <div className="max-w-[1280px] mx-auto px-6 sm:px-8 lg:px-12" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
 
         {/* ═══ HEADER ═══ */}
-        <header style={{ marginBottom: '36px' }}>
-          <h1 style={{
-            fontSize: '40px', fontWeight: 800, letterSpacing: '-0.02em',
-            color: textPrimary, margin: 0, fontFamily: "'Poppins', sans-serif",
-            lineHeight: 1.1
-          }}>
+        <header className="mb-6 sm:mb-9">
+          <h1 className="text-2xl sm:text-3xl lg:text-[40px] font-extrabold tracking-tight"
+            style={{ color: textPrimary, margin: 0, fontFamily: "'Poppins', sans-serif", lineHeight: 1.1 }}>
             {lang === 'es' ? 'Ajustes' : 'Settings'}
           </h1>
-          <p style={{
-            fontSize: '17px', fontWeight: 500, color: textSecondary,
-            marginTop: '8px', margin: 0, paddingTop: '8px'
-          }}>
+          <p className="text-sm sm:text-base mt-1" style={{ fontWeight: 500, color: textSecondary }}>
             {lang === 'es' ? 'Personaliza tu experiencia y controla tu privacidad.' : 'Customize your experience and control your privacy.'}
           </p>
         </header>
@@ -590,7 +584,7 @@ export default function ConfiguracionStudentSection({ darkMode: darkModeProp, on
               </div>
             </div>
           </div>
-          <button onClick={() => { toast(lang === 'es' ? 'Cerrando sesión...' : 'Logging out...'); setTimeout(() => { if (onLogout) onLogout(); }, 800); }} style={{
+          <button onClick={() => { if (onLogout) { onLogout(); } }} style={{
             height: '54px', padding: '0 28px', borderRadius: '16px',
             border: '1.5px solid rgba(236,72,153,0.3)',
             background: 'transparent',

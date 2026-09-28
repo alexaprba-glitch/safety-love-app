@@ -6,6 +6,8 @@ import AvatarPortrait from './AvatarPortrait.jsx';
 import ChatIA from './ChatIA.jsx';
 import BlogAnonimo from './BlogAnonimo.jsx';
 import GamesSection from './GamesSection.jsx';
+import MiniJuegoBienestar from './MiniJuegoBienestar.jsx';
+import MiloWardrobe from './MiloWardrobe.jsx';
 import ConfiguracionStudentSection from './ConfiguracionStudentSection.jsx';
 import DiaryPersonalSection from './DiaryPersonalSection.jsx';
 import PsicologoSection from './PsicologoSection.jsx';
@@ -14,6 +16,8 @@ import RemindersSection from './RemindersSection.jsx';
 import SafetyMascot from './SafetyMascot.jsx';
 import MascotSelector from './MascotSelector.jsx';
 import { getMascotById } from './mascotData';
+import { toastError, toastSuccess } from './Toast';
+import { PageLoader } from './LoadingSpinner';
 import {
   Heart,
   MessageCircle,
@@ -56,6 +60,12 @@ import {
   Info,
   Share2,
   Moon,
+  Laugh,
+  BatteryFull,
+  BatteryMedium,
+  BatteryLow,
+  HeartHandshake,
+  HeartCrack,
   PawPrint,
   Bone,
   Volleyball,
@@ -103,7 +113,13 @@ import {
   Circle,
   X,
   Camera,
-  Menu
+  Menu,
+  Gamepad2,
+  Gamepad,
+  Store,
+  UtensilsCrossed,
+  Utensils,
+  Sun
 } from 'lucide-react';
 
 // ================= ERROR BOUNDARY =================
@@ -410,11 +426,11 @@ function DailyVerseSection({ darkMode }) {
                 minHeight: '100px',
                 padding: '24px',
                 borderRadius: '20px',
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.06)',
+                background: dm ? 'rgba(255,255,255,0.04)' : 'rgba(244,63,158,0.04)',
+                border: dm ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(244,63,158,0.12)',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = 'rgba(244,63,158,0.25)'; e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}>
+              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = 'rgba(244,63,158,0.25)'; e.currentTarget.style.background = dm ? 'rgba(255,255,255,0.06)' : 'rgba(244,63,158,0.08)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = dm ? 'rgba(255,255,255,0.06)' : 'rgba(244,63,158,0.12)'; e.currentTarget.style.background = dm ? 'rgba(255,255,255,0.04)' : 'rgba(244,63,158,0.04)'; }}>
               <div style={{
                 width: '56px',
                 height: '56px',
@@ -429,8 +445,8 @@ function DailyVerseSection({ darkMode }) {
                 <Heart size={24} style={{ color: pink }} />
               </div>
               <div>
-                <p style={{ fontSize: '18px', fontWeight: 700, color: '#FFFFFF', marginBottom: '4px' }}>Guarda este versículo</p>
-                <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>Recuérdalo cuando lo necesites</p>
+                <p style={{ fontSize: '18px', fontWeight: 700, color: dm ? '#FFFFFF' : '#0F172A', marginBottom: '4px' }}>Guarda este versículo</p>
+                <p style={{ fontSize: '14px', color: dm ? 'rgba(255,255,255,0.5)' : '#64748B' }}>Recuérdalo cuando lo necesites</p>
               </div>
             </button>
 
@@ -440,11 +456,11 @@ function DailyVerseSection({ darkMode }) {
                 minHeight: '100px',
                 padding: '24px',
                 borderRadius: '20px',
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.06)',
+                background: dm ? 'rgba(255,255,255,0.04)' : 'rgba(167,139,250,0.04)',
+                border: dm ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(167,139,250,0.12)',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = 'rgba(167,139,250,0.25)'; e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}>
+              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = 'rgba(167,139,250,0.25)'; e.currentTarget.style.background = dm ? 'rgba(255,255,255,0.06)' : 'rgba(167,139,250,0.08)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = dm ? 'rgba(255,255,255,0.06)' : 'rgba(167,139,250,0.12)'; e.currentTarget.style.background = dm ? 'rgba(255,255,255,0.04)' : 'rgba(167,139,250,0.04)'; }}>
               <div style={{
                 width: '56px',
                 height: '56px',
@@ -459,8 +475,8 @@ function DailyVerseSection({ darkMode }) {
                 <PenLine size={24} style={{ color: '#A78BFA' }} />
               </div>
               <div>
-                <p style={{ fontSize: '18px', fontWeight: 700, color: '#FFFFFF', marginBottom: '4px' }}>Escribe tu reflexión</p>
-                <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>Anota lo que este versículo significa para ti</p>
+                <p style={{ fontSize: '18px', fontWeight: 700, color: dm ? '#FFFFFF' : '#0F172A', marginBottom: '4px' }}>Escribe tu reflexión</p>
+                <p style={{ fontSize: '14px', color: dm ? 'rgba(255,255,255,0.5)' : '#64748B' }}>Anota lo que este versículo significa para ti</p>
               </div>
             </button>
           </div>
@@ -1021,12 +1037,10 @@ function AnonymousChatSection({ darkMode, language, showMascotGame, setShowMasco
         if (!mounted) return;
         setAuthUser(user || null);
         if (user?.id) {
-          const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle();
+          const { data: profile } = await supabase.from('profiles').select('id, name, email, avatar, role, gender_theme, mascot_type, specialty, onboarding_completed, created_at, updated_at').eq('id', user.id).maybeSingle();
           if (profile) {
-            // try common photo fields
-            const photo = profile.avatar_url || profile.photo || profile.avatar || profile.image || null;
+            const photo = profile.avatar || null;
             if (photo && mounted) setUserPhotoUrl(photo);
-            // do not override local userName here to avoid ordering issues; leave userName state as-is
           }
         }
       } catch (e) {
@@ -1044,12 +1058,12 @@ function AnonymousChatSection({ darkMode, language, showMascotGame, setShowMasco
       try {
         const userIds = Array.from(new Set(posts.filter(p => p && p.user_id && !profilesCache[p.user_id]).map(p => p.user_id)));
         if (userIds.length === 0) return;
-        const { data, error } = await supabase.from('profiles').select('id, avatar_url').in('id', userIds);
+        const { data, error } = await supabase.from('profiles').select('id, avatar').in('id', userIds);
         if (error || !data) return;
         if (!mounted) return;
         const next = { ...profilesCache };
         data.forEach(pr => {
-          if (pr && pr.id) next[pr.id] = pr.avatar_url || null;
+          if (pr && pr.id) next[pr.id] = pr.avatar || null;
         });
         setProfilesCache(next);
         // also update posts in-place to include profile_avatar_url for convenience
@@ -1130,7 +1144,9 @@ function AnonymousChatSection({ darkMode, language, showMascotGame, setShowMasco
               const { data: pubData } = supabase.storage.from('post-images').getPublicUrl(fp);
               imageUrl = pubData?.publicUrl || null;
             }
-          } catch (_) {}
+          } catch (_) {
+            toastError('Error al subir la imagen');
+          }
         }
 
         const entry = {
@@ -1148,8 +1164,13 @@ function AnonymousChatSection({ darkMode, language, showMascotGame, setShowMasco
         const { data, error } = await supabase.from('posts').insert(entry).select().single();
         if (!error && data) {
           setPosts(prev => prev.map(p => p.id === tempId ? { ...p, id: data.id, time: 'Ahora', image_url: data.image_url || p.image_url } : p));
+          toastSuccess('Publicación creada');
+        } else if (error) {
+          toastError('Error al crear la publicación');
         }
-      } catch (_) {}
+      } catch (_) {
+        toastError('Error inesperado al publicar');
+      }
       setImageUploading(false);
     })();
   };
@@ -1167,7 +1188,7 @@ function AnonymousChatSection({ darkMode, language, showMascotGame, setShowMasco
     if (publicAvatar) {
       return (
         <div className="w-11 h-11 rounded-full overflow-hidden border border-gray-100 flex-shrink-0">
-          <img src={publicAvatar} alt={post.author || 'Usuario'} className="w-full h-full object-cover" />
+          <img src={publicAvatar} alt={post.author || 'Usuario'} className="w-full h-full object-cover" loading="lazy" decoding="async" />
         </div>
       );
     }
@@ -1198,7 +1219,7 @@ function AnonymousChatSection({ darkMode, language, showMascotGame, setShowMasco
     if (avatarImage) {
       return (
         <div className="w-11 h-11 rounded-full overflow-hidden border border-gray-100 flex-shrink-0">
-          <img src={avatarImage} alt={post.author || 'Usuario'} className="w-full h-full object-cover" />
+          <img src={avatarImage} alt={post.author || 'Usuario'} className="w-full h-full object-cover" loading="lazy" decoding="async" />
         </div>
       );
     }
@@ -1297,7 +1318,7 @@ function AnonymousChatSection({ darkMode, language, showMascotGame, setShowMasco
                     <label htmlFor="post-image-input" className="cursor-pointer hover:opacity-90"><ImageIcon size={20} /></label>
                     <button type="button" className="hover:opacity-90 text-slate-500" aria-label="mention"></button>
                     {imagePreviewUrl && (
-                      <img src={imagePreviewUrl} alt="preview" className="w-16 h-12 object-cover rounded-lg ml-2 border" />
+                      <img src={imagePreviewUrl} alt="preview" className="w-16 h-12 object-cover rounded-lg ml-2 border" loading="lazy" decoding="async" />
                     )}
                   </div>
 
@@ -1389,7 +1410,7 @@ function AnonymousChatSection({ darkMode, language, showMascotGame, setShowMasco
                   <div className={`text-[16px] mb-2 ${dm ? 'text-white' : 'text-slate-900'}`}>{post.title}</div>
                   <div className={`text-[14px] leading-relaxed ${dm ? 'text-gray-300' : 'text-slate-600'}`}>{post.body}</div>
                   {post.image_url && (
-                    <img src={post.image_url} alt="Imagen de la anécdota" onClick={() => setLightboxImg(post.image_url)} className="mt-3 w-full max-h-48 rounded-2xl object-cover border border-[#F6E6EE] cursor-pointer hover:opacity-90 transition" />
+                    <img src={post.image_url} alt="Imagen de la anécdota" onClick={() => setLightboxImg(post.image_url)} className="mt-3 w-full max-h-48 rounded-2xl object-cover border border-[#F6E6EE] cursor-pointer hover:opacity-90 transition" loading="lazy" decoding="async" />
                   )}
 
                   <div className="mt-5 flex items-center justify-between gap-4">
@@ -1560,7 +1581,7 @@ function AnonymousChatSection({ darkMode, language, showMascotGame, setShowMasco
               <p className="text-[13.5px] leading-[1.65] text-slate-500">{selectedPost.body}</p>
 
               {selectedPost.image_url && (
-                <img src={selectedPost.image_url} alt="" className="mt-3 w-full max-h-52 rounded-xl object-cover" />
+                <img src={selectedPost.image_url} alt="" className="mt-3 w-full max-h-52 rounded-xl object-cover" loading="lazy" decoding="async" />
               )}
 
               {/* Tags */}
@@ -1598,7 +1619,7 @@ function AnonymousChatSection({ darkMode, language, showMascotGame, setShowMasco
                             )}
                           </div>
                           {comment.text && <p className="mt-0.5 text-[13px] leading-[1.55] text-slate-600">{comment.text}</p>}
-                          {comment.image && <img src={comment.image} alt="" className="mt-1.5 max-h-24 rounded-lg object-cover" />}
+                          {comment.image && <img src={comment.image} alt="" className="mt-1.5 max-h-24 rounded-lg object-cover" loading="lazy" decoding="async" />}
                           <button onClick={() => toggleCommentLike(comment.id)} className={`mt-1.5 inline-flex items-center gap-1 text-[10px] ${comment.liked ? 'text-rose-400' : 'text-slate-400 hover:text-rose-400'}`}>
                             <Heart size={10} fill={comment.liked ? 'currentColor' : 'none'} strokeWidth={2} />
                             {comment.likes}
@@ -1633,7 +1654,7 @@ function AnonymousChatSection({ darkMode, language, showMascotGame, setShowMasco
               </div>
               {commentDraft.imageUrl && (
                 <div className="relative mt-2 inline-block">
-                  <img src={commentDraft.imageUrl} alt="" className="max-h-16 rounded-lg object-cover" />
+                  <img src={commentDraft.imageUrl} alt="" className="max-h-16 rounded-lg object-cover" loading="lazy" decoding="async" />
                   <button onClick={() => setCommentDraft(prev => ({ ...prev, imageUrl: null }))} className="absolute -top-1.5 -right-1.5 h-5 w-5 flex items-center justify-center rounded-full bg-slate-800 text-white text-[9px]">✕</button>
                 </div>
               )}
@@ -1905,6 +1926,64 @@ function CfgFontSize({ darkMode, icon, label, fontSize, setFontSize, triggerToas
 }
 
 export default function DashboardEscritorio({ onLogout }) {
+  // ── Indicadores derivados de la mascota ──
+  // Felicidad → depende de Diversión (si diversión baja, felicidad baja)
+  // Energía   → depende de Sueño (si sueño bajo, energía baja)
+  // Afecto    → depende de Hambre (si tiene hambre, afecto baja)
+  // Cada uno suma un pequeño bono de experiencia (nivel + XP)
+  const getIndicatorLevel = (value) => {
+    if (value >= 80) return 'Max';
+    if (value >= 60) return 'Alta';
+    if (value >= 40) return 'Media';
+    if (value >= 20) return 'Baja';
+    return 'Crítica';
+  };
+  // Iconos estilo iOS (SF Symbols / Lucide redondeado con tinte suave).
+  // Felicidad → Diversión | Energía → Sueño | Afecto → Hambre
+  const iosIconWrap = (Icon, color, filled) => (
+    <span style={{
+      width: '44px', height: '44px', borderRadius: '50%',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: '#FFFFFF',
+      boxShadow: '0 2px 8px rgba(15,23,42,0.08)',
+      flexShrink: 0,
+    }}>
+      <Icon size={24} color={color} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" fill={filled ? color : 'none'} fillOpacity={filled ? 0.18 : 0} />
+    </span>
+  );
+  const getHappinessIcon = (value) => {
+    const c = '#F97316';
+    if (value >= 80) return iosIconWrap(Laugh, c, true);
+    if (value >= 60) return iosIconWrap(Smile, c, true);
+    if (value >= 40) return iosIconWrap(Meh, c, false);
+    if (value >= 20) return iosIconWrap(Frown, c, false);
+    return iosIconWrap(Frown, '#CBD5E1', false);
+  };
+  const getEnergyIcon = (value) => {
+    const c = '#3B82F6';
+    if (value >= 80) return iosIconWrap(Zap, c, true);
+    if (value >= 60) return iosIconWrap(BatteryFull, c, true);
+    if (value >= 40) return iosIconWrap(BatteryMedium, c, false);
+    if (value >= 20) return iosIconWrap(BatteryLow, c, false);
+    return iosIconWrap(Moon, '#94A3B8', false);
+  };
+  const getAffectionIcon = (value) => {
+    const c = '#22C55E';
+    if (value >= 80) return iosIconWrap(HeartHandshake, c, true);
+    if (value >= 60) return iosIconWrap(Heart, c, true);
+    if (value >= 40) return iosIconWrap(Heart, '#A3B43B', false);
+    if (value >= 20) return iosIconWrap(HeartCrack, '#94A3B8', false);
+    return iosIconWrap(HeartCrack, '#CBD5E1', false);
+  };
+  const getPetMoodMessage = (value) => {
+    if (value >= 80) return '¡Estoy increíble! ¡Me encanta estar contigo! 🥰';
+    if (value >= 60) return 'Estoy muy feliz de verte hoy! 😊';
+    if (value >= 40) return 'Estoy bien, pero podría estar mejor 🙂';
+    if (value >= 20) return 'No me siento muy bien... ¿me cuidas? 😐';
+    return 'Necesito ayuda... ¡dame de comer, juega o déjame dormir! 😢';
+  };
+  const [dataLoading, setDataLoading] = useState(true);
+
   // Navigation active tab
   const [activeNav, setActiveNav] = useState('Inicio');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -1927,6 +2006,112 @@ export default function DashboardEscritorio({ onLogout }) {
   const [showWardrobe, setShowWardrobe] = useState(false);
   const [feedAnimations, setFeedAnimations] = useState([]);
 
+  // Market state
+  const [showMarket, setShowMarket] = useState(false);
+  const [petStars, setPetStars] = useState(() => {
+    try { return parseInt(localStorage.getItem('pet_stars')) || 0; } catch { return 0; }
+  });
+  // Sincroniza las estrellas cuando los juegos las otorgan (suman al mercado)
+  useEffect(() => {
+    const syncStars = () => {
+      try { setPetStars(parseInt(localStorage.getItem('pet_stars')) || 0); } catch {}
+    };
+    window.addEventListener('pet-stars-changed', syncStars);
+    window.addEventListener('focus', syncStars);
+    return () => {
+      window.removeEventListener('pet-stars-changed', syncStars);
+      window.removeEventListener('focus', syncStars);
+    };
+  }, []);
+  const [ownedFood, setOwnedFood] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('pet_owned_food')) || ['pollo']; } catch { return ['pollo']; }
+  });
+  const [selectedFood, setSelectedFood] = useState('pollo');
+  const MARKET_ITEMS = [
+    { id: 'manzana', emoji: '🍎', name: 'Manzana', cost: 5, hunger: 15, desc: 'Una fruta fresca y nutritiva' },
+    { id: 'pollo', emoji: '🍗', name: 'Pollo', cost: 10, hunger: 25, desc: 'Plato principal delicioso' },
+    { id: 'pastel', emoji: '🍰', name: 'Pastel', cost: 20, hunger: 40, desc: 'Un postre especial' },
+    { id: 'pizza', emoji: '🍕', name: 'Pizza', cost: 15, hunger: 30, desc: 'Slice perfecto de pizza' },
+    { id: 'sushi', emoji: '🍣', name: 'Sushi', cost: 25, hunger: 45, desc: 'Sushi fresco premium' },
+    { id: 'helado', emoji: '🍦', name: 'Helado', cost: 8, hunger: 12, desc: 'Fresco y delicioso' },
+  ];
+  const getFoodEmoji = (foodId) => {
+    const item = MARKET_ITEMS.find(i => i.id === foodId);
+    return item ? item.emoji : '🍗';
+  };
+  const buyFood = (item) => {
+    if (petStars < item.cost) { triggerToast('No tienes suficientes estrellas ⭐'); return; }
+    const newStars = petStars - item.cost;
+    setPetStars(newStars);
+    try { localStorage.setItem('pet_stars', newStars.toString()); } catch {}
+    const newOwned = [...ownedFood, item.id];
+    setOwnedFood(newOwned);
+    try { localStorage.setItem('pet_owned_food', JSON.stringify(newOwned)); } catch {}
+    triggerToast(`¡${item.name} comprado! Ve a alimentar a tu mascota 🍽️`);
+  };
+
+  const feedPet = () => {
+    if (ownedFood.length === 0) { triggerToast('No tienes comida. ¡Ve al mercado! 🏪'); return; }
+    if (isFeedLimited) { triggerToast(`Alimentar bloqueado. Espera ${feedTimeLeft} min ⏳`); return; }
+    const foodId = ownedFood[0];
+    const item = MARKET_ITEMS.find(i => i.id === foodId) || { id: foodId, name: 'Comida', hunger: 15 };
+    const newOwned = ownedFood.slice(1);
+    setOwnedFood(newOwned);
+    try { localStorage.setItem('pet_owned_food', JSON.stringify(newOwned)); } catch {}
+    setSelectedFood(item.id);
+    setHunger(prev => Math.min(100, prev + item.hunger));
+    addXp(5);
+    const id = Date.now();
+    setFeedAnimations(prev => [...prev, { id, type: 'food', foodId: item.id }]);
+    setTimeout(() => setFeedAnimations(prev => prev.filter(a => a.id !== id)), 1200);
+    const expId = Date.now() + 1;
+    setFeedAnimations(prev => [...prev, { id: expId, type: 'exp' }]);
+    setTimeout(() => setFeedAnimations(prev => prev.filter(a => a.id !== expId)), 1400);
+    setActionLimits(prev => {
+      const newCount = prev.feedCount + 1;
+      const updates = { ...prev, feedCount: newCount };
+      if (newCount >= MAX_ACTIONS) updates.feedCooldownEnd = Date.now() + COOLDOWN_MS;
+      try {
+        const all = getAllActionLimits();
+        all[currentMascotId] = updates;
+        localStorage.setItem('pet_action_limits', JSON.stringify(all));
+      } catch {}
+      return updates;
+    });
+    triggerToast(`¡${item.name}! +${item.hunger} hambre 🎉`);
+  };
+
+  // Action limits (10 per hour, skipped for new accounts)
+  const MAX_ACTIONS = 10;
+  const COOLDOWN_MS = 60 * 60 * 1000; // 1 hour
+  const [accountCreatedAt, setAccountCreatedAt] = useState(null);
+  const isNewAccount = accountCreatedAt ? (Date.now() - new Date(accountCreatedAt).getTime()) < 24 * 60 * 60 * 1000 : false;
+  const getAllActionLimits = () => {
+    try { return JSON.parse(localStorage.getItem('pet_action_limits')) || {}; } catch { return {}; }
+  };
+  const getMascotLimits = (mascotId) => {
+    const all = getAllActionLimits();
+    const data = all[mascotId] || { feedCount: 0, feedCooldownEnd: 0, sleepCount: 0, sleepCooldownEnd: 0 };
+    const now = Date.now();
+    return {
+      feedCount: now < (data.feedCooldownEnd || 0) ? (data.feedCount || 0) : 0,
+      feedCooldownEnd: data.feedCooldownEnd || 0,
+      sleepCount: now < (data.sleepCooldownEnd || 0) ? (data.sleepCount || 0) : 0,
+      sleepCooldownEnd: data.sleepCooldownEnd || 0,
+    };
+  };
+  const [actionLimits, setActionLimits] = useState(() => {
+    try {
+      const mascotId = localStorage.getItem('safetyLoveMascot') || 'michi-menta';
+      return getMascotLimits(mascotId);
+    } catch { return { feedCount: 0, feedCooldownEnd: 0, sleepCount: 0, sleepCooldownEnd: 0 }; }
+  });
+
+  const isFeedLimited = !isNewAccount && actionLimits.feedCount >= MAX_ACTIONS && Date.now() < actionLimits.feedCooldownEnd;
+  const isSleepLimited = !isNewAccount && actionLimits.sleepCount >= MAX_ACTIONS && Date.now() < actionLimits.sleepCooldownEnd;
+  const feedTimeLeft = isFeedLimited ? Math.ceil((actionLimits.feedCooldownEnd - Date.now()) / 60000) : 0;
+  const sleepTimeLeft = isSleepLimited ? Math.ceil((actionLimits.sleepCooldownEnd - Date.now()) / 60000) : 0;
+
   // Per-mascot level & XP
   const getMascotStats = () => {
     try {
@@ -1941,10 +2126,11 @@ export default function DashboardEscritorio({ onLogout }) {
     try {
       const all = JSON.parse(localStorage.getItem('mascot_stats')) || {};
       const current = all[currentMascotId] || { level: 1, xp: 0 };
+      const xpNeeded = current.level * 120;
       let newXp = current.xp + amount;
       let newLevel = current.level;
-      if (newXp >= 100) {
-        newXp = newXp - 100;
+      if (newXp >= xpNeeded) {
+        newXp = newXp - xpNeeded;
         newLevel = current.level + 1;
         triggerToast(`¡Tu mascota subió al nivel ${newLevel}! 🎉`);
       }
@@ -1954,6 +2140,22 @@ export default function DashboardEscritorio({ onLogout }) {
       setMascotXp(newXp);
     } catch {}
   };
+
+  // ── Valores derivados: felicidad / energía / afecto (incluye experiencia) ──
+  // experienceScore: Nv.1 = 0-25pts, Nv.2 = 25-50, Nv.3 = 50-75, Nv.4+ = 75-100
+  const xpNeededForLevel = mascotLevel * 120;
+  const xpProgress = xpNeededForLevel > 0 ? Math.min(1, mascotXp / xpNeededForLevel) : 0;
+  const experienceScore = Math.min(100, (mascotLevel - 1) * 25 + xpProgress * 25);
+  // Mapeo directo pedido: diversión→felicidad, sueño→energía, hambre→afecto
+  const happinessBase = fun;
+  const energyBase = sleep;
+  const affectionBase = hunger;
+  const happinessValue = Math.min(100, Math.round(happinessBase * 0.8 + experienceScore * 0.2));
+  const energyValue = Math.min(100, Math.round(energyBase * 0.85 + experienceScore * 0.15));
+  const affectionValue = Math.min(100, Math.round(affectionBase * 0.75 + experienceScore * 0.25));
+  const happinessLevel = getIndicatorLevel(happinessValue);
+  const energyLevel = getIndicatorLevel(energyValue);
+  const affectionLevel = getIndicatorLevel(affectionValue);
 
   // Mascot selector state
   const [currentMascotId, setCurrentMascotId] = useState(() => {
@@ -1972,6 +2174,7 @@ export default function DashboardEscritorio({ onLogout }) {
     })();
     setMascotLevel(stats.level);
     setMascotXp(stats.xp);
+    setActionLimits(getMascotLimits(mascotId));
   };
 
   // Mascot game state
@@ -1985,16 +2188,17 @@ export default function DashboardEscritorio({ onLogout }) {
   const [gameLives, setGameLives] = useState(3);
   const [poisonHit, setPoisonHit] = useState(false);
   const [gameRunning, setGameRunning] = useState(false);
-  const [showAchievement, setShowAchievement] = useState(false);
-  const [achievementText, setAchievementText] = useState('');
-  const [achievementLevels, setAchievementLevels] = useState({ 20: false, 40: false });
+  const [combo, setCombo] = useState(0);
+  const [shieldActive, setShieldActive] = useState(false);
+  const [multiplierActive, setMultiplierActive] = useState(false);
   const gameContainerRef = useRef(null);
   const spawnIntervalRef = useRef(null);
   const gameTimerRef = useRef(null);
   const animationRef = useRef(null);
   const itemIdRef = useRef(0);
   const mascotXRef = useRef(50);
-  const gameScoreRef = useRef(0); // para que el loop vea el score actual en tiempo real
+  const gameScoreRef = useRef(0);
+  const comboRef = useRef(0); // para que el loop vea el score actual en tiempo real
 
   // helper to clamp and update mascot position
   const updateMascotX = (next) => {
@@ -2007,32 +2211,47 @@ export default function DashboardEscritorio({ onLogout }) {
 
   const spawnItem = () => {
     const id = ++itemIdRef.current;
-    const x = Math.random() * 80 + 10; // percent 10-90
+    const x = Math.random() * 80 + 10;
     const roll = Math.random();
 
     let item;
-    if (roll < 0.66) {
+    if (roll < 0.45) {
       const foods = [
         { emoji: '🍓', value: 1, label: 'Fruta' },
         { emoji: '🍏', value: 2, label: 'Manzana' },
         { emoji: '🥕', value: 2, label: 'Zanahoria' },
         { emoji: '🍉', value: 2, label: 'Sandía' },
         { emoji: '🍊', value: 2, label: 'Naranja' },
-        { emoji: '🥐', value: 3, label: 'Pan' }
+        { emoji: '🥐', value: 3, label: 'Pan' },
+        { emoji: '🧁', value: 3, label: 'Cupcake' },
+        { emoji: '🍩', value: 3, label: 'Dona' },
       ];
       const chosen = foods[Math.floor(Math.random() * foods.length)];
-      item = { id, x, y: -28, speed: 0.8 + Math.random() * 1.1, type: 'good', emoji: chosen.emoji, value: chosen.value, label: chosen.label };
-    } else if (roll < 0.9) {
+      item = { id, x, y: -28, speed: 0.9 + Math.random() * 1.2, type: 'good', emoji: chosen.emoji, value: chosen.value, label: chosen.label };
+    } else if (roll < 0.80) {
       const poisons = [
         { emoji: '☠️', value: 1, label: 'Veneno' },
         { emoji: '🧪', value: 1, label: 'Droga' },
         { emoji: '💀', value: 2, label: 'Peligro' },
-        { emoji: '🦴', value: 1, label: 'Peligro' }
+        { emoji: '🦴', value: 1, label: 'Peligro' },
+        { emoji: '🦠', value: 2, label: 'Virus' },
       ];
       const chosen = poisons[Math.floor(Math.random() * poisons.length)];
-      item = { id, x, y: -28, speed: 0.9 + Math.random() * 1.2, type: 'bad', emoji: chosen.emoji, value: chosen.value, label: chosen.label };
+      item = { id, x, y: -28, speed: 1.0 + Math.random() * 1.3, type: 'bad', emoji: chosen.emoji, value: chosen.value, label: chosen.label };
+    } else if (roll < 0.90) {
+      const bonuses = [
+        { emoji: '⭐', value: 5, label: 'Bonus' },
+        { emoji: '🌟', value: 8, label: 'Súper Bonus' },
+        { emoji: '✨', value: 4, label: 'Brillo' },
+      ];
+      const chosen = bonuses[Math.floor(Math.random() * bonuses.length)];
+      item = { id, x, y: -28, speed: 0.8 + Math.random() * 1.1, type: 'bonus', emoji: chosen.emoji, value: chosen.value, label: chosen.label };
+    } else if (roll < 0.95) {
+      item = { id, x, y: -28, speed: 0.7 + Math.random() * 0.9, type: 'shield', emoji: '🛡️', value: 0, label: 'Escudo' };
+    } else if (roll < 0.98) {
+      item = { id, x, y: -28, speed: 0.7 + Math.random() * 0.9, type: 'multiplier', emoji: '✖️', value: 0, label: 'x2 Puntos' };
     } else {
-      item = { id, x, y: -28, speed: 1.0 + Math.random() * 1.2, type: 'bonus', emoji: '⭐', value: 4, label: 'Bonus' };
+      item = { id, x, y: -28, speed: 0.6 + Math.random() * 0.8, type: 'golden', emoji: '💫', value: 12, label: 'Estrella Dorada' };
     }
 
     setGameItems(prev => [...prev, item]);
@@ -2042,31 +2261,42 @@ export default function DashboardEscritorio({ onLogout }) {
     setGameRunning(false);
     setShowMascotGame(false);
     setGameMessage(reason ? `${reason} - Puntos: ${gameScore}` : `Juego terminado. Puntos: ${gameScore}`);
-    if (gameScore > 0) addXp(Math.min(gameScore, 50));
+    // Mínimo 2 estrellas por jugar, aunque se juegue mal (suman al mercado)
+    let stars = 2;
+    if (gameScore > 0) {
+      addXp(Math.min(gameScore, 20));
+      stars = Math.max(2, Math.floor(gameScore / 4) + (comboRef.current >= 10 ? 2 : 0));
+    }
+    setPetStars(prev => {
+      const newTotal = prev + stars;
+      try { localStorage.setItem('pet_stars', newTotal.toString()); } catch {}
+      return newTotal;
+    });
+    triggerToast(`¡Ganaste ${stars} ⭐ por jugar! Ya están en tu mercado 🏪`);
     if (spawnIntervalRef.current) { clearInterval(spawnIntervalRef.current); spawnIntervalRef.current = null; }
     if (gameTimerRef.current) { clearInterval(gameTimerRef.current); gameTimerRef.current = null; }
     if (animationRef.current) { cancelAnimationFrame(animationRef.current); animationRef.current = null; }
   };
 
   const startGame = () => { console.log('startGame called, activeNav=', activeNav);
-    // initialize
     setGameItems([]);
     setGameScore(0);
     gameScoreRef.current = 0;
     setGameTime(30);
     setGameLives(3);
     setGameRunning(true);
-    setShowAchievement(false);
-    setAchievementText('');
-    setAchievementLevels({ 20: false, 40: false });
     setGameMessage('');
     itemIdRef.current = 0;
     mascotXRef.current = 50;
     setMascotX(50);
+    setCombo(0);
+    comboRef.current = 0;
+    setShieldActive(false);
+    setMultiplierActive(false);
 
     // spawn items every 700ms
     if (spawnIntervalRef.current) clearInterval(spawnIntervalRef.current);
-    spawnIntervalRef.current = setInterval(spawnItem, 700);
+    spawnIntervalRef.current = setInterval(spawnItem, 550);
 
     // countdown timer
     if (gameTimerRef.current) clearInterval(gameTimerRef.current);
@@ -2087,41 +2317,71 @@ export default function DashboardEscritorio({ onLogout }) {
         const width = container ? container.clientWidth : 300;
         const height = container ? container.clientHeight : 240;
         const next = [];
-        const multiplier = Math.min(2.8, 1 + (gameScoreRef.current || 0) * 0.025);
+        const multiplier = Math.min(3.2, 1 + (gameScoreRef.current || 0) * 0.035);
 
         prev.forEach(it => {
           const ny = it.y + it.speed * multiplier * (delta / 16);
           const mascotPx = (mascotXRef.current / 100) * width;
           const itemPx = (it.x / 100) * width;
+          const mascotBottomY = height - 24;
+          const itemCenterY = ny + 26;
 
-          if (ny > height - 48) {
-            if (Math.abs(mascotPx - itemPx) < 60) {
-              setGameItems(prevItems => prevItems.filter(item => item.id !== it.id));
+          // Check collision - mascot is near bottom, item must be close to mascot's Y level
+          const hitX = Math.abs(mascotPx - itemPx) < 55;
+          const hitY = Math.abs(itemCenterY - mascotBottomY) < 55;
 
-              if (it.type === 'good' || it.type === 'bonus') {
-                setGameScore(s => {
-                  const ns = s + (it.value || 1);
-                  gameScoreRef.current = ns;
-                  setGameMessage(it.type === 'bonus' ? '¡Bonus extra! ✨' : '¡Buena elección! 🍏');
-                  return ns;
-                });
-              }
+          if (hitX && hitY) {
+            if (it.type === 'good' || it.type === 'bonus' || it.type === 'golden') {
+              comboRef.current = comboRef.current + 1;
+              setCombo(comboRef.current);
+              const comboBonus = comboRef.current >= 5 ? Math.floor(comboRef.current / 5) : 0;
+              const mult = multiplierActive ? 2 : 1;
+              setGameScore(s => {
+                const ns = s + ((it.value || 1) + comboBonus) * mult;
+                gameScoreRef.current = ns;
+                if (it.type === 'golden') setGameMessage('¡Estrella Dorada! 💫');
+                else if (it.type === 'bonus') setGameMessage(comboBonus > 0 ? `¡Bonus x2! +${comboBonus} combo ✨` : '¡Bonus extra! ✨');
+                else setGameMessage(comboBonus > 0 ? `¡Combo x${comboRef.current}! +${comboBonus} 🍏` : '¡Buena elección! 🍏');
+                return ns;
+              });
+              if (comboRef.current === 15) triggerToast('¡Combo x15! 🔥');
+              if (comboRef.current === 25) triggerToast('¡Combo x25! ¡Eres increíble! 🌟');
+            }
 
-              if (it.type === 'bad') {
+            if (it.type === 'shield') {
+              setShieldActive(true);
+              setGameMessage('¡Escudo activado! 🛡️');
+              setTimeout(() => setShieldActive(false), 3500);
+              triggerToast('Escudo activo por 3.5 segundos 🛡️');
+            }
+
+            if (it.type === 'multiplier') {
+              setMultiplierActive(true);
+              setGameMessage('¡x2 Puntos activado! ✖️');
+              setTimeout(() => setMultiplierActive(false), 4000);
+              triggerToast('Multiplicador x2 por 4 segundos ✖️');
+            }
+
+            if (it.type === 'bad') {
+              if (shieldActive) {
+                setGameMessage('¡Escudo bloqueó el veneno! 🛡️');
+              } else {
+                comboRef.current = 0;
+                setCombo(0);
                 setPoisonHit(true);
                 setTimeout(() => setPoisonHit(false), 600);
                 setGameLives(l => {
                   const nl = l - 1;
                   setGameMessage('¡Cuidado! Hay veneno. ☠️');
-                  if (nl <= 0) {
-                    endGame('No te quedan vidas');
-                  }
+                  if (nl <= 0) endGame('No te quedan vidas');
                   return nl;
                 });
               }
             }
             return;
           }
+
+          if (ny > height + 52) return;
 
           next.push({ ...it, y: ny });
         });
@@ -2140,27 +2400,6 @@ export default function DashboardEscritorio({ onLogout }) {
       if (e.key === 'ArrowRight' || e.key === 'd') updateMascotX(x => x + MASCOT_STEP);
   };
 
-  useEffect(() => {
-    if (gameScore >= 20 && !achievementLevels[20]) {
-      setAchievementLevels(prev => ({ ...prev, 20: true }));
-      setAchievementText('20 puntos');
-      setShowAchievement(true);
-      setGameMessage('¡Logro desbloqueado! 20 puntos');
-    }
-
-    if (gameScore >= 40 && !achievementLevels[40]) {
-      setAchievementLevels(prev => ({ ...prev, 40: true }));
-      setAchievementText('40 puntos');
-      setShowAchievement(true);
-      setGameMessage('¡Logro desbloqueado! 40 puntos');
-    }
-  }, [gameScore, achievementLevels]);
-
-  useEffect(() => {
-    if (!showAchievement) return;
-    const timeout = setTimeout(() => setShowAchievement(false), 2000);
-    return () => clearTimeout(timeout);
-  }, [showAchievement]);
 
   useEffect(() => {
     // expose a global helper so other components (mascot buttons elsewhere) can open the game in Inicio
@@ -2176,13 +2415,12 @@ export default function DashboardEscritorio({ onLogout }) {
   }, []);
 
   useEffect(() => {
-    // if navigation changes to the MiniJuego view, start the game and ensure the game area is shown
+    // if navigation changes to the MiniJuego view, show the new game modal
+    // (it runs its own loop; the legacy engine below is only for the chat embed)
     if (activeNav === 'MiniJuego') {
       setShowMascotGame(true);
-      // small delay to ensure DOM mounted
-      setTimeout(() => { if (!gameRunning) startGame(); }, 50);
     } else {
-      // if navigating away, stop the game
+      // if navigating away, stop the legacy game loop if it was running
       if (gameRunning) endGame('Navegación');
     }
   }, [activeNav]);
@@ -2493,12 +2731,13 @@ export default function DashboardEscritorio({ onLogout }) {
         if (!mounted) return;
         setAuthUser(user || null);
         if (user?.id) {
-          const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle();
+          const { data: profile } = await supabase.from('profiles').select('id, name, email, avatar, role, gender_theme, mascot_type, specialty, onboarding_completed, created_at, updated_at').eq('id', user.id).maybeSingle();
           if (profile && mounted) {
-            const photo = profile.avatar_url || profile.photo || profile.avatar || profile.image || null;
+            const photo = profile.avatar || null;
             if (photo) setUserPhotoUrl(photo);
             if (profile.name) setUserName(profile.name);
             if (profile.email) setUserEmail(profile.email);
+            if (profile.created_at) setAccountCreatedAt(profile.created_at);
           }
           if (!profile && mounted) {
             const metaName = user.user_metadata?.name;
@@ -2508,7 +2747,9 @@ export default function DashboardEscritorio({ onLogout }) {
           }
         }
       } catch (e) {
-        // ignore errors, keep local fallback
+        toastError('Error al cargar tu perfil');
+      } finally {
+        if (mounted) setDataLoading(false);
       }
     };
     loadProfile();
@@ -2567,7 +2808,7 @@ export default function DashboardEscritorio({ onLogout }) {
         consejos: 'Consejos Diarios', versiculo: 'Versículo Diario',
         diario: 'Diario Personal', recordatorios: 'Recordatorios', configuracion: 'Configuración',
         avatar: 'Personaliza tu avatar',
-        hola: 'Hola de nuevo, Miguel', cultivar: '¿Qué te gustaría cultivar hoy?',
+        hola: 'Hola de nuevo', cultivar: '¿Qué te gustaría cultivar hoy?',
         bienvenida: 'Bienvenido a tu espacio', safetyLove: 'Safety Love está aquí para apoyarte. Respira, refleja y avanza a tu propio ritmo hoy.',
         momento: 'Tu Momento de Bienestar', configTitle: 'Configuración',
         configSub: 'Personaliza tu experiencia en Safety Love',
@@ -2735,13 +2976,113 @@ export default function DashboardEscritorio({ onLogout }) {
     return msg.tab.toLowerCase() === activeForumTab.toLowerCase();
   });
 
+  //if (dataLoading) return <PageLoader text="Cargando tu espacio..." />;
+
   return (
     <div className={`flex h-screen w-screen overflow-hidden select-none font-sans relative ${fontSizeMap[fontSize]} ${darkMode ? 'bg-[#070D1C] text-slate-200' : 'text-slate-900'}`} style={{ background: darkMode ? undefined : '#F5F0E8' }}>
       
       {/* Toast Alert popup */}
       {showToast && (
-        <div className="fixed top-5 right-5 z-[9999] bg-[#E88B9A] text-white py-3 px-6 rounded-full shadow-lg font-semibold text-xs tracking-wide animate-fadeIn flex items-center gap-2">
-          {toastMessage}
+        <div style={{
+          position: 'fixed', top: '20px', right: '20px', zIndex: 99999,
+          animation: 'toastSlideIn 0.4s cubic-bezier(0.23,1,0.32,1)',
+          pointerEvents: 'auto',
+        }}>
+          <style>{`
+            @keyframes toastSlideIn {
+              from { opacity: 0; transform: translateX(60px) scale(0.92); }
+              to { opacity: 1; transform: translateX(0) scale(1); }
+            }
+            @keyframes toastSlideOut {
+              from { opacity: 1; transform: translateX(0) scale(1); }
+              to { opacity: 0; transform: translateX(60px) scale(0.92); }
+            }
+            @keyframes toastBellRing {
+              0%, 100% { transform: rotate(0deg); }
+              15% { transform: rotate(14deg); }
+              30% { transform: rotate(-12deg); }
+              45% { transform: rotate(8deg); }
+              60% { transform: rotate(-6deg); }
+              75% { transform: rotate(3deg); }
+            }
+            @keyframes toastAccentPulse {
+              0%, 100% { opacity: 0.5; transform: scale(1); }
+              50% { opacity: 0.9; transform: scale(1.15); }
+            }
+            @keyframes toastProgress {
+              from { width: 100%; }
+              to { width: 0%; }
+            }
+          `}</style>
+          <div style={{
+            background: 'linear-gradient(135deg, #FFF5F7 0%, #FFE8EE 50%, #FFF0F4 100%)',
+            borderRadius: '24px',
+            padding: '16px 22px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+            boxShadow: '0 12px 40px rgba(236,72,153,0.12), 0 4px 16px rgba(236,72,153,0.06), 0 1px 4px rgba(0,0,0,0.03)',
+            border: '1.5px solid rgba(236,72,153,0.12)',
+            minWidth: '260px',
+            maxWidth: '420px',
+            position: 'relative',
+            overflow: 'hidden',
+          }}>
+            {/* Bell icon circle */}
+            <div style={{
+              width: '48px', height: '48px', borderRadius: '50%',
+              background: 'linear-gradient(135deg, #FCE7F3 0%, #FBCFE8 100%)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+              border: '2px solid rgba(236,72,153,0.1)',
+              animation: 'toastBellRing 1.5s ease-in-out 0.3s',
+            }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#EC4899" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+            </div>
+
+            {/* Text */}
+            <span style={{
+              fontSize: '15px', fontWeight: 700,
+              fontFamily: "'Poppins', sans-serif",
+              color: '#1E293B', letterSpacing: '-0.01em',
+              flex: 1, lineHeight: 1.3,
+            }}>
+              {toastMessage}
+            </span>
+
+            {/* Decorative accents */}
+            <div style={{ position: 'absolute', top: '10px', right: '60px', display: 'flex', gap: '3px', animation: 'toastAccentPulse 2s ease-in-out infinite' }}>
+              <div style={{ width: '3px', height: '12px', borderRadius: '2px', background: 'rgba(236,72,153,0.3)', transform: 'rotate(-20deg)' }} />
+              <div style={{ width: '3px', height: '16px', borderRadius: '2px', background: 'rgba(236,72,153,0.4)', transform: 'rotate(0deg)' }} />
+              <div style={{ width: '3px', height: '10px', borderRadius: '2px', background: 'rgba(236,72,153,0.3)', transform: 'rotate(20deg)' }} />
+            </div>
+
+            {/* Arrow */}
+            <div style={{
+              width: '32px', height: '32px', borderRadius: '50%',
+              background: 'rgba(236,72,153,0.08)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EC4899" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14" />
+                <path d="m12 5 7 7-7 7" />
+              </svg>
+            </div>
+
+            {/* Progress bar */}
+            <div style={{
+              position: 'absolute', bottom: 0, left: 0, height: '3px',
+              background: 'linear-gradient(90deg, #EC4899, #F472B6)',
+              borderRadius: '0 0 24px 24px',
+              animation: `toastProgress 3000ms linear forwards`,
+              width: '100%',
+              transformOrigin: 'left',
+            }} />
+          </div>
         </div>
       )}
 
@@ -3050,90 +3391,153 @@ export default function DashboardEscritorio({ onLogout }) {
 
       {/* ================= SIDEBAR ================= */}
       <nav
-        className="hidden lg:flex flex-col items-center z-50"
+        className="hidden lg:flex flex-col z-50 shrink-0"
         style={{
-          position: 'fixed',
-          left: '16px',
-          top: '16px',
-          bottom: '16px',
-          width: '72px',
-          padding: '18px 0',
-          background: darkMode ? 'linear-gradient(180deg, #151D30 0%, #111827 100%)' : 'linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 100%)',
-          borderRadius: '28px',
-          boxShadow: darkMode ? '0 8px 32px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.2)' : '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.05)',
-          border: darkMode ? 'none' : '1px solid rgba(0,0,0,0.06)',
+          width: '236px',
+          margin: 0,
+          minHeight: 0,
+          height: '100vh',
+          maxHeight: '100vh',
+          padding: '20px 14px 16px',
+          background: darkMode ? 'linear-gradient(180deg, #151D30 0%, #111827 100%)' : '#FFFFFF',
+          borderRadius: 0,
+          boxShadow: 'none',
+          border: 'none',
+          borderRight: darkMode ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(15,23,42,0.08)',
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center',
-          gap: '4px',
+          alignItems: 'stretch',
+          gap: '6px',
+          overflow: 'hidden',
+          position: 'sticky',
+          top: 0,
+          alignSelf: 'stretch',
         }}
       >
         {/* Logo */}
-        <button onClick={() => setActiveNav('Inicio')} className="flex items-center justify-center mb-1 transition-all duration-200 hover:scale-110" title="Safety Love">
-          <img src="/logo.png" alt="SafetyLove" className="w-20 h-20 object-contain" />
+        <button onClick={() => setActiveNav('Inicio')} className="flex items-center gap-3 transition-all duration-200" title="Safety Love" style={{ padding: '4px 8px 14px', border: 'none', background: 'transparent', cursor: 'pointer', textAlign: 'left' }}>
+          <img src="/logo.webp" loading="lazy" width="48" height="48" alt="SafetyLove" className="object-contain shrink-0" style={{ width: '64px', height: '64px' }} />
+          <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15, minWidth: 0 }}>
+            <span style={{ fontSize: '17px', fontWeight: 800, letterSpacing: '-0.01em', color: darkMode ? '#F1F5F9' : '#0F172A', fontFamily: "'Poppins', sans-serif", whiteSpace: 'nowrap' }}>Safety Love</span>
+            <span style={{ fontSize: '11px', fontWeight: 500, color: darkMode ? '#64748B' : '#94A3B8', whiteSpace: 'nowrap' }}>Tu espacio seguro</span>
+          </span>
         </button>
 
         {/* Nav items */}
-        <div className="flex flex-col items-center flex-1 justify-between py-2">
+        <div className="flex flex-col flex-1" style={{ gap: '4px', overflowY: 'auto', overflowX: 'hidden', padding: '2px', margin: '0 -2px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {allSidebarLinks.map((link) => {
             const isActive = activeNav === link.id;
             return (
               <button
                 key={link.id}
                 onClick={() => setActiveNav(link.id)}
-                className="relative flex items-center justify-center transition-all duration-200 group"
+                className="group"
+                title={link.label}
                 style={{
-                  width: isActive ? '42px' : '36px',
-                  height: '36px',
-                  borderRadius: '14px',
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '8px 10px',
+                  borderRadius: '18px',
+                  border: isActive
+                    ? (darkMode ? '1px solid rgba(244,63,158,0.25)' : '1px solid rgba(244,63,158,0.14)')
+                    : '1px solid transparent',
                   background: isActive
-                    ? 'linear-gradient(135deg, #F43F9E, #E11D6D)'
+                    ? (darkMode ? 'rgba(244,63,158,0.12)' : '#FFF0F6')
                     : 'transparent',
-                  color: isActive ? '#FFFFFF' : darkMode ? '#64748B' : '#475569',
-                  boxShadow: isActive ? '0 4px 16px rgba(244,63,158,0.35)' : 'none',
+                  boxShadow: isActive
+                    ? (darkMode ? '0 2px 12px rgba(244,63,158,0.15)' : '0 2px 12px rgba(244,63,158,0.08)')
+                    : 'none',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'background 250ms ease, box-shadow 250ms ease, border-color 250ms ease, transform 250ms ease',
+                  minHeight: '52px',
+                  overflow: 'hidden',
                 }}
                 onMouseEnter={(e) => {
                   if (!isActive) {
-                    e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)';
-                    e.currentTarget.style.color = darkMode ? '#94A3B8' : '#334155';
+                    e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.05)' : '#FDF2F8';
+                    e.currentTarget.style.borderColor = darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(244,63,158,0.08)';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!isActive) {
                     e.currentTarget.style.background = 'transparent';
-                    e.currentTarget.style.color = darkMode ? '#64748B' : '#475569';
+                    e.currentTarget.style.borderColor = 'transparent';
                   }
                 }}
-                title={link.label}
               >
-                <span className="shrink-0" style={{ transform: 'scale(0.85)' }}>{link.icon}</span>
-                {/* Active label pill extending right */}
-                {isActive && (
-                  <span className="absolute left-full ml-2 px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap pointer-events-none opacity-100 transition-opacity duration-200" style={{ background: darkMode ? '#1a2236' : '#FFFFFF', color: darkMode ? '#FFFFFF' : '#1E293B', boxShadow: darkMode ? '0 4px 12px rgba(0,0,0,0.3)' : '0 4px 12px rgba(0,0,0,0.1)' }}>
-                    {link.label}
-                  </span>
-                )}
+                {/* Icono en contenedor redondeado */}
+                <span style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  background: isActive
+                    ? 'linear-gradient(135deg, #F43F9E, #EC4899)'
+                    : (darkMode ? 'rgba(255,255,255,0.05)' : '#F8FAFC'),
+                  color: isActive ? '#FFFFFF' : (darkMode ? '#7C8DA6' : '#475569'),
+                  boxShadow: isActive ? '0 4px 12px rgba(244,63,158,0.3)' : 'none',
+                  transition: 'background 250ms ease, color 250ms ease, box-shadow 250ms ease',
+                }}>
+                  <span className="shrink-0" style={{ transform: 'scale(0.85)', display: 'flex' }}>{link.icon}</span>
+                </span>
+                {/* Texto dentro del propio elemento */}
+                <span style={{
+                  fontSize: '13.5px',
+                  fontWeight: isActive ? 650 : 500,
+                  color: isActive ? (darkMode ? '#FFFFFF' : '#0F172A') : (darkMode ? '#7C8DA6' : '#64748B'),
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  letterSpacing: '-0.005em',
+                  transition: 'color 250ms ease',
+                  flex: 1,
+                  minWidth: 0,
+                }}>
+                  {link.label}
+                </span>
               </button>
             );
           })}
         </div>
 
         {/* Profile */}
-        <button
-          onClick={() => setProfileOpen(true)}
-          className="w-9 h-9 rounded-[14px] flex items-center justify-center overflow-hidden transition-all duration-200 hover:scale-105"
-          style={{
-            background: 'linear-gradient(135deg, #F472B6, #FB7185)',
-            boxShadow: '0 4px 12px rgba(244,114,182,0.3)',
-          }}
-          title={userName}
-        >
-          {userPhotoUrl ? (
-            <img src={userPhotoUrl} alt="Avatar" className="w-full h-full object-cover rounded-[14px]" />
-          ) : (
-            <span className="text-white text-[12px] font-extrabold">{userName?.charAt(0) || 'U'}</span>
-          )}
-        </button>
+        <div style={{ paddingTop: '12px', borderTop: darkMode ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(15,23,42,0.06)' }}>
+          <button
+            onClick={() => setProfileOpen(true)}
+            className="w-full flex items-center transition-all duration-200"
+            style={{
+              gap: '12px',
+              padding: '8px 10px',
+              borderRadius: '18px',
+              border: '1px solid transparent',
+              background: 'transparent',
+              cursor: 'pointer',
+              textAlign: 'left',
+              overflow: 'hidden',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.05)' : '#FDF2F8'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+            title={userName}
+          >
+            <span style={{ width: '36px', height: '36px', borderRadius: '12px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: 'linear-gradient(135deg, #F472B6, #FB7185)', boxShadow: '0 4px 12px rgba(244,114,182,0.3)', color: '#fff' }}>
+              {userPhotoUrl ? (
+                <img src={userPhotoUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <span style={{ fontSize: '12px', fontWeight: 800 }}>{userName?.charAt(0) || 'U'}</span>
+              )}
+            </span>
+            <span style={{ minWidth: 0, flex: 1, display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+              <span style={{ fontSize: '13px', fontWeight: 650, color: darkMode ? '#E2E8F0' : '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{userName || 'Mi perfil'}</span>
+              <span style={{ fontSize: '11px', fontWeight: 500, color: darkMode ? '#64748B' : '#94A3B8' }}>Ver perfil</span>
+            </span>
+          </button>
+        </div>
       </nav>
 
       {/* ================= MOBILE HAMBURGER ================= */}
@@ -3143,335 +3547,116 @@ export default function DashboardEscritorio({ onLogout }) {
         <Menu size={20} />
       </button>
 
-      {/* Mobile overlay for settings etc */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-[70] bg-black/40 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
-      )}
+      {/* Mobile nav drawer */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <>
+            <motion.div
+              className="lg:hidden fixed inset-0 z-[85] bg-black/40 backdrop-blur-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+            />
+            <motion.nav
+              className="lg:hidden fixed top-0 left-0 bottom-0 z-[86] flex flex-col"
+              style={{
+                width: '260px',
+                background: darkMode ? 'linear-gradient(180deg, #151D30 0%, #111827 100%)' : 'linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 100%)',
+                boxShadow: darkMode ? '8px 0 32px rgba(0,0,0,0.4)' : '8px 0 32px rgba(0,0,0,0.1)',
+              }}
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            >
+              <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: darkMode ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.06)' }}>
+                <img src="/logo.webp" loading="lazy" width="48" height="48" alt="SafetyLove" className="w-10 h-10 object-contain" />
+                <button onClick={() => setMobileMenuOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ color: darkMode ? '#64748B' : '#94A3B8' }}>
+                  <X size={18} />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto py-3 px-3" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                {allSidebarLinks.map((link) => {
+                  const isActive = activeNav === link.id;
+                  return (
+                    <button
+                      key={link.id}
+                      onClick={() => { setActiveNav(link.id); setMobileMenuOpen(false); }}
+                      className="w-full flex items-center text-left"
+                      style={{
+                        gap: '12px',
+                        padding: '8px 10px',
+                        borderRadius: '18px',
+                        border: isActive
+                          ? (darkMode ? '1px solid rgba(244,63,158,0.25)' : '1px solid rgba(244,63,158,0.14)')
+                          : '1px solid transparent',
+                        background: isActive
+                          ? (darkMode ? 'rgba(244,63,158,0.12)' : '#FFF0F6')
+                          : 'transparent',
+                        boxShadow: isActive
+                          ? (darkMode ? '0 2px 12px rgba(244,63,158,0.15)' : '0 2px 12px rgba(244,63,158,0.08)')
+                          : 'none',
+                        transition: 'background 250ms ease, box-shadow 250ms ease, border-color 250ms ease',
+                        minHeight: '52px',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <span style={{
+                        width: '36px', height: '36px', borderRadius: '12px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                        background: isActive ? 'linear-gradient(135deg, #F43F9E, #EC4899)' : (darkMode ? 'rgba(255,255,255,0.05)' : '#F8FAFC'),
+                        color: isActive ? '#FFFFFF' : (darkMode ? '#7C8DA6' : '#475569'),
+                        boxShadow: isActive ? '0 4px 12px rgba(244,63,158,0.3)' : 'none',
+                      }}>
+                        <span className="shrink-0" style={{ transform: 'scale(0.85)', display: 'flex' }}>{link.icon}</span>
+                      </span>
+                      <span style={{
+                        fontWeight: isActive ? 650 : 500,
+                        fontSize: '13.5px',
+                        color: isActive ? (darkMode ? '#FFFFFF' : '#0F172A') : (darkMode ? '#7C8DA6' : '#64748B'),
+                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1, minWidth: 0,
+                      }}>{link.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="px-3 py-3" style={{ borderTop: darkMode ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.06)' }}>
+                <button onClick={() => { setProfileOpen(true); setMobileMenuOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl" style={{ color: darkMode ? '#94A3B8' : '#475569', fontSize: '13px', fontWeight: 500 }}>
+                  <User size={18} />
+                  <span>{userName || 'Mi perfil'}</span>
+                </button>
+              </div>
+            </motion.nav>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* ================= MAIN CONTENT AREA ================= */}
-      <main className="flex-1 flex flex-col overflow-hidden h-full transition-[padding] duration-[200ms] ease-in-out"
-        style={{ padding: '0 0 0 104px' }}>
+      <main className="flex-1 flex flex-col overflow-hidden h-full min-w-0 pl-8 lg:pl-12">
+        <AnimatePresence mode="wait">
         {activeNav === 'MiniJuego' ? (
-          <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(7,13,28,0.85)', backdropFilter: 'blur(10px)', padding: '24px' }}>
-            <style>{`
-              @keyframes float-item { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-              @keyframes game-star-glow { 0%,100% { opacity: 0.3; } 50% { opacity: 0.6; } }
-              @keyframes game-mascot-idle { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-4px); } }
-              .game-star-particle { animation: game-star-glow 3s ease-in-out infinite; }
-              .game-mascot-float { animation: game-mascot-idle 2.5s ease-in-out infinite; }
-              @media (max-width: 640px) { .game-controls-row { flex-direction: column !important; align-items: stretch !important; } .game-stats-row { flex-wrap: wrap !important; } }
-            `}</style>
-
-            <div className="w-full overflow-hidden" style={{
-              maxWidth: '700px',
-              borderRadius: '28px',
-              border: '1px solid rgba(255,255,255,0.06)',
-              background: 'linear-gradient(165deg, #0D1527 0%, #101A32 40%, #0F1830 100%)',
-              boxShadow: '0 32px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.03)',
-              padding: '20px',
-            }}>
-
-              {/* ── HEADER ── */}
-              <div className="text-center relative" style={{ marginBottom: '16px' }}>
-                <button onClick={() => { setActiveNav('Inicio'); setShowMascotGame(false); endGame(); }}
-                  className="absolute top-0 right-0 flex items-center transition-all duration-200"
-                  style={{
-                    height: '36px',
-                    padding: '0 14px',
-                    borderRadius: '10px',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    background: 'rgba(255,255,255,0.03)',
-                    color: '#94A3B8',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    gap: '6px',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#F83B91'; e.currentTarget.style.background = 'rgba(248,59,145,0.08)'; e.currentTarget.style.color = '#F8FAFC'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; e.currentTarget.style.color = '#94A3B8'; }}>
-                  <X size={14} /> Cerrar
-                </button>
-
-                <p style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '3px', textTransform: 'uppercase', color: '#F83B91', marginBottom: '10px' }}>
-                  &#10022; Mascota &#10022;
-                </p>
-                <h2 style={{ fontSize: '28px', fontWeight: 800, color: '#F8FAFC', lineHeight: 1.1, marginBottom: '6px', fontFamily: "'Poppins', sans-serif" }}>
-                  Mini-juego de bienestar
-                </h2>
-                <p style={{ fontSize: '14px', color: '#94A3B8' }}>
-                  Cuida de tu mascota y mejora tu bienestar día a día.
-                </p>
-              </div>
-
-              {/* ── STATS + GAME AREA ── */}
-
-              {/* Stats row */}
-              <div className="game-stats-row flex items-center" style={{ gap: '10px', marginBottom: '14px' }}>
-                <div className="flex items-center" style={{
-                  padding: '7px 14px',
-                  borderRadius: '10px',
-                  border: '1px solid rgba(248,59,145,0.15)',
-                  background: 'rgba(248,59,145,0.06)',
-                  gap: '6px',
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  color: '#F83B91',
-                }}>
-                  <span style={{ opacity: 0.7 }}>⏱</span> {gameTime}s
-                </div>
-                <div className="flex items-center" style={{
-                  padding: '7px 14px',
-                  borderRadius: '10px',
-                  border: '1px solid rgba(34,197,94,0.15)',
-                  background: 'rgba(34,197,94,0.06)',
-                  gap: '6px',
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  color: '#22C55E',
-                }}>
-                  <span style={{ opacity: 0.7 }}>❤️</span> {gameLives}
-                </div>
-                <div className="flex items-center" style={{
-                  padding: '7px 14px',
-                  borderRadius: '10px',
-                  border: '1px solid rgba(250,204,21,0.15)',
-                  background: 'rgba(250,204,21,0.06)',
-                  gap: '6px',
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  color: '#FACC15',
-                }}>
-                  <span style={{ opacity: 0.7 }}>⭐</span> {gameScore}
-                </div>
-              </div>
-
-              {/* ── GAME ARENA ── */}
-              <div ref={gameContainerRef} tabIndex={0} onKeyDown={handleKeyDown}
-                className="relative w-full overflow-hidden"
-                style={{
-                  height: '340px',
-                  borderRadius: '28px',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                  background: 'linear-gradient(180deg, #0B1120 0%, #111D35 40%, #151F3A 70%, #0D1525 100%)',
-                  boxShadow: 'inset 0 2px 60px rgba(0,0,0,0.4), 0 0 40px rgba(139,92,246,0.04)',
-                }}>
-
-                {/* Starfield background */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                  {[
-                    { x: '5%', y: '8%', r: 1.5, o: 0.35, d: 0 },
-                    { x: '15%', y: '5%', r: 1, o: 0.25, d: 0.5 },
-                    { x: '28%', y: '12%', r: 1.2, o: 0.3, d: 1 },
-                    { x: '42%', y: '3%', r: 0.8, o: 0.2, d: 1.5 },
-                    { x: '58%', y: '7%', r: 1.4, o: 0.28, d: 0.8 },
-                    { x: '72%', y: '10%', r: 1, o: 0.22, d: 2 },
-                    { x: '85%', y: '4%', r: 1.3, o: 0.3, d: 0.3 },
-                    { x: '93%', y: '14%', r: 0.9, o: 0.2, d: 1.2 },
-                    { x: '10%', y: '20%', r: 0.7, o: 0.15, d: 2.5 },
-                    { x: '50%', y: '18%', r: 0.6, o: 0.12, d: 1.8 },
-                    { x: '78%', y: '22%', r: 0.8, o: 0.18, d: 0.7 },
-                    { x: '35%', y: '25%', r: 0.5, o: 0.1, d: 3 },
-                  ].map((s, i) => (
-                    <div key={i} className="absolute rounded-full bg-white game-star-particle"
-                      style={{ left: s.x, top: s.y, width: s.r * 2, height: s.r * 2, opacity: s.o, animationDelay: `${s.d}s` }} />
-                  ))}
-                </div>
-
-                {/* Subtle nebula glow */}
-                <div className="absolute pointer-events-none" style={{
-                  top: '10%', left: '20%', width: '300px', height: '200px',
-                  borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.04) 0%, transparent 70%)',
-                }} />
-                <div className="absolute pointer-events-none" style={{
-                  top: '5%', right: '15%', width: '250px', height: '180px',
-                  borderRadius: '50%', background: 'radial-gradient(circle, rgba(248,59,145,0.03) 0%, transparent 70%)',
-                }} />
-
-                {/* Ground — curved platform */}
-                <div className="absolute inset-x-0 bottom-0 pointer-events-none" style={{ height: '80px' }}>
-                  <svg width="100%" height="80" viewBox="0 0 1000 80" preserveAspectRatio="none" style={{ position: 'absolute', bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="groundGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="rgba(248,59,145,0.06)" />
-                        <stop offset="100%" stopColor="rgba(13,21,37,0.9)" />
-                      </linearGradient>
-                    </defs>
-                    <path d="M0,30 Q250,0 500,20 Q750,40 1000,15 L1000,80 L0,80 Z" fill="url(#groundGrad)" />
-                    <path d="M0,30 Q250,0 500,20 Q750,40 1000,15" fill="none" stroke="rgba(248,59,145,0.12)" strokeWidth="1" />
-                  </svg>
-                </div>
-
-                {/* Ground glow line */}
-                <div className="absolute inset-x-0 pointer-events-none" style={{ bottom: '70px', height: '1px', background: 'linear-gradient(90deg, transparent 5%, rgba(248,59,145,0.1) 30%, rgba(139,92,246,0.08) 70%, transparent 95%)' }} />
-
-                {/* ── GAME ITEMS ── */}
-                {gameItems.map(item => (
-                  <div
-                    key={item.id}
-                    style={{ position: 'absolute', left: `${item.x}%`, top: item.y, animation: `float-item ${2.5 + (item.id % 3) * 0.4}s ease-in-out infinite` }}
-                    className="pointer-events-none select-none"
-                  >
-                    <div style={{
-                      width: '64px', height: '64px',
-                      borderRadius: '50%',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: '28px',
-                      border: item.type === 'good'
-                        ? '2px solid rgba(34,197,94,0.45)'
-                        : item.type === 'bonus'
-                        ? '2px solid rgba(250,204,21,0.45)'
-                        : '2px solid rgba(244,63,94,0.45)',
-                      background: item.type === 'good'
-                        ? 'rgba(34,197,94,0.1)'
-                        : item.type === 'bonus'
-                        ? 'rgba(250,204,21,0.1)'
-                        : 'rgba(244,63,94,0.1)',
-                      boxShadow: item.type === 'good'
-                        ? '0 0 20px rgba(34,197,94,0.15)'
-                        : item.type === 'bonus'
-                        ? '0 0 20px rgba(250,204,21,0.15)'
-                        : '0 0 20px rgba(244,63,94,0.15)',
-                    }}>
-                      {item.emoji}
-                    </div>
-                  </div>
-                ))}
-
-                {/* ── MASCOTA GLOW ── */}
-                <div className="absolute pointer-events-none" style={{ bottom: '20px', left: `${mascotX}%`, transform: 'translateX(-50%)' }}>
-                  <div style={{
-                    width: '100px', height: '12px',
-                    borderRadius: '50%',
-                    background: 'rgba(248,59,145,0.12)',
-                    filter: 'blur(10px)',
-                    position: 'absolute', bottom: '-4px', left: '50%', transform: 'translateX(-50%)',
-                  }} />
-                </div>
-
-                {/* ── MASCOTA ── */}
-                <div
-                  className={`pointer-events-none ${!poisonHit ? 'game-mascot-float' : ''}`}
-                  style={{
-                    position: 'absolute', left: `${mascotX}%`, bottom: '24px',
-                    transform: `translateX(-50%) ${poisonHit ? 'rotate(-15deg) scale(0.85)' : ''}`,
-                    filter: poisonHit ? 'grayscale(100%) brightness(0.6)' : 'none',
-                    transition: 'all 0.3s ease',
-                    zIndex: 10,
-                  }}
-                >
-                  <div style={{
-                    width: '130px', height: '130px',
-                    filter: 'drop-shadow(0 16px 24px rgba(244,114,182,0.18))',
-                  }}>
-                    <SafetyMascot size={100} mascotId={currentMascotId} />
-                  </div>
-                </div>
-
-                {/* ── ACHIEVEMENT OVERLAY ── */}
-                {showAchievement && (
-                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center z-20">
-                    <div className="animate-[bounce_0.7s_ease-in-out] rounded-[20px] border border-[#F83B91]/30 backdrop-blur-sm" style={{
-                      background: 'rgba(16,26,45,0.92)',
-                      padding: '20px 36px',
-                      boxShadow: '0 20px 60px rgba(248,59,145,0.25)',
-                    }}>
-                      <div className="text-center" style={{ fontSize: '11px', fontWeight: 900, letterSpacing: '0.25em', textTransform: 'uppercase', color: '#F83B91', marginBottom: '6px' }}>Logro</div>
-                      <div style={{ fontSize: '20px', fontWeight: 800, color: '#F8FAFC' }}>{achievementText} ✨</div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* ── CONTROLS ── */}
-              <div className="game-controls-row flex items-center justify-center" style={{ gap: '10px', marginTop: '14px' }}>
-                <button onClick={startGame}
-                  className="flex items-center justify-center transition-all duration-200 active:scale-[0.97]"
-                  style={{
-                    height: '44px',
-                    padding: '0 24px',
-                    borderRadius: '14px',
-                    background: 'linear-gradient(135deg, #F83B91, #C026D3)',
-                    color: '#FFFFFF',
-                    fontSize: '14px',
-                    fontWeight: 800,
-                    boxShadow: '0 8px 24px rgba(248,59,145,0.3)',
-                    gap: '8px',
-                    border: 'none',
-                    cursor: 'pointer',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 12px 32px rgba(248,59,145,0.4)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 8px 24px rgba(248,59,145,0.3)'; e.currentTarget.style.transform = 'translateY(0)'; }}>
-                  <span style={{ fontSize: '16px' }}>&#9654;</span> Iniciar juego
-                </button>
-                <button onClick={() => updateMascotX(x => x - MASCOT_STEP)}
-                  className="flex items-center justify-center transition-all duration-200 active:scale-[0.97]"
-                  style={{
-                    height: '44px',
-                    padding: '0 20px',
-                    borderRadius: '14px',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    background: 'rgba(255,255,255,0.03)',
-                    color: '#94A3B8',
-                    fontSize: '13px',
-                    fontWeight: 700,
-                    gap: '6px',
-                    cursor: 'pointer',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = '#F8FAFC'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; e.currentTarget.style.color = '#94A3B8'; }}>
-                  <span style={{ fontSize: '16px' }}>&#9664;</span> Mover
-                </button>
-                <button onClick={() => updateMascotX(x => x + MASCOT_STEP)}
-                  className="flex items-center justify-center transition-all duration-200 active:scale-[0.97]"
-                  style={{
-                    height: '44px',
-                    padding: '0 20px',
-                    borderRadius: '14px',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    background: 'rgba(255,255,255,0.03)',
-                    color: '#94A3B8',
-                    fontSize: '13px',
-                    fontWeight: 700,
-                    gap: '6px',
-                    cursor: 'pointer',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = '#F8FAFC'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; e.currentTarget.style.color = '#94A3B8'; }}>
-                  Mover <span style={{ fontSize: '16px' }}>&#9654;</span>
-                </button>
-              </div>
-
-              {/* ── INSTRUCTION CARD ── */}
-              <div className="flex items-center" style={{
-                marginTop: '14px',
-                padding: '16px 20px',
-                borderRadius: '16px',
-                border: '1px solid rgba(255,255,255,0.06)',
-                background: 'rgba(255,255,255,0.03)',
-                gap: '14px',
-              }}>
-                <div style={{
-                  width: '42px', height: '42px',
-                  borderRadius: '50%',
-                  background: 'rgba(248,59,145,0.1)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  flexShrink: 0,
-                }}>
-                  <Heart size={20} style={{ color: '#F83B91' }} />
-                </div>
-                <div>
-                  <p style={{ fontSize: '15px', fontWeight: 700, color: '#F8FAFC', lineHeight: 1.3 }}>
-                    {gameMessage || 'Recoge la comida y evita el veneno.'}
-                  </p>
-                  <p style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>
-                    Cada elección positiva te ayuda a sentirte mejor.
-                  </p>
-                </div>
-              </div>
-
-            </div>
-          </div>
+          <motion.div key="MiniJuego" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.25, ease: 'easeInOut' }} className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto" style={{ background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(12px)', padding: '20px' }}>
+            <MiniJuegoBienestar
+              darkMode={darkMode}
+              mascotId={currentMascotId}
+              onFinish={({ score, lost }) => {
+                // Estrellas solo si inició el juego y perdió (mínimo 2 ⭐)
+                if (!lost) return;
+                addXp(Math.min(score, 20));
+                const stars = Math.max(2, Math.floor(score / 4));
+                setPetStars(prev => {
+                  const newTotal = prev + stars;
+                  try { localStorage.setItem('pet_stars', newTotal.toString()); } catch {}
+                  return newTotal;
+                });
+                triggerToast(`¡Ganaste ${stars} ⭐ por jugar! Ya están en tu mercado 🏪`);
+              }}
+              onExit={() => { setActiveNav('Inicio'); setShowMascotGame(false); }}
+            />
+          </motion.div>
         ) : activeNav === 'Registro de Emociones' ? (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: darkMode ? '#070D1C' : '#F5F0E8', minHeight: 0 }}>
+          <motion.div key="Registro" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.25, ease: 'easeInOut' }} style={{ flex: 1, display: 'flex', flexDirection: 'column', background: darkMode ? '#070D1C' : '#F5F0E8', minHeight: 0 }}>
             <div style={{ flex: 1, padding: '44px 48px', overflowY: 'auto', minHeight: 0 }} className="custom-scrollbar">
               <div style={{ maxWidth: '1400px', width: '100%', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 400px', gap: '24px' }} className="emotion-grid">
                 <style>{`
@@ -3858,50 +4043,52 @@ export default function DashboardEscritorio({ onLogout }) {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         ) : activeNav === 'Diario Personal' ? (
-          <div style={{ minHeight: 0 }} className={`flex-1 overflow-y-auto custom-scrollbar ${darkMode ? 'bg-[#070D1C]' : 'bg-[#F5F0E8]'}`}>
+          <motion.div key="Diario" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.25, ease: 'easeInOut' }} style={{ minHeight: 0 }} className={`flex-1 overflow-y-auto custom-scrollbar ${darkMode ? 'bg-[#070D1C]' : 'bg-[#F5F0E8]'}`}>
             <DiaryPersonalSection darkMode={darkMode} onToast={triggerToast} userName={userName} />
-          </div>
+          </motion.div>
         ) : activeNav === 'Chat Anónimo' ? (
-          <div className={`flex-1 overflow-y-auto custom-scrollbar ${darkMode ? 'bg-[#070D1C]' : 'bg-[#F5F0E8]'}`}>
-            <BlogAnonimo darkMode={darkMode} />
-          </div>
+          <motion.div key="Blog" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.25, ease: 'easeInOut' }} className={`flex-1 overflow-y-auto custom-scrollbar ${darkMode ? 'bg-[#070D1C]' : 'bg-[#F5F0E8]'}`}>
+            <BlogAnonimo darkMode={darkMode} userPhotoUrl={userPhotoUrl} />
+          </motion.div>
         ) : activeNav === 'Chat con IA' ? (
-          <div className={`flex-1 h-full ${darkMode ? 'bg-[#070D1C]' : 'bg-[#F5F0E8]'}`}>
+          <motion.div key="ChatIA" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.25, ease: 'easeInOut' }} className={`flex-1 h-full ${darkMode ? 'bg-[#070D1C]' : 'bg-[#F5F0E8]'}`}>
             <ChatIA darkMode={darkMode} userPhotoUrl={userPhotoUrl} />
-          </div>
+          </motion.div>
         ) : activeNav === 'Versículo Diario' ? (
-          <div style={{ minHeight: 0 }} className={`flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar ${darkMode ? 'bg-[#070D1C]' : 'bg-[#F5F0E8]'}`}>
+          <motion.div key="Versiculo" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.25, ease: 'easeInOut' }} style={{ minHeight: 0 }} className={`flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar ${darkMode ? 'bg-[#070D1C]' : 'bg-[#F5F0E8]'}`}>
             <DailyVerseSection darkMode={darkMode} />
-          </div>
+          </motion.div>
         ) : activeNav === 'Consejos Diarios' ? (
-          <div className={`flex-1 overflow-y-auto custom-scrollbar ${darkMode ? 'bg-[#1a1a2e]' : 'bg-[#F5F0E8]'}`}>
+          <motion.div key="Consejos" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.25, ease: 'easeInOut' }} className={`flex-1 overflow-y-auto custom-scrollbar ${darkMode ? 'bg-[#1a1a2e]' : 'bg-[#F5F0E8]'}`}>
             <DailyAdviceSection darkMode={darkMode} />
-          </div>
+          </motion.div>
         ) : activeNav === 'Configuración' ? (
-          <div className={`flex-1 overflow-y-auto custom-scrollbar ${darkMode ? 'bg-[#1a1a2e]' : 'bg-[#F5F0E8]'}`}>
+          <motion.div key="Config" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.25, ease: 'easeInOut' }} className={`flex-1 overflow-y-auto custom-scrollbar ${darkMode ? 'bg-[#1a1a2e]' : 'bg-[#F5F0E8]'}`}>
             <ConfiguracionStudentSection darkMode={darkMode} onToast={triggerToast} onDarkModeChange={setDarkMode} userPhotoUrl={userPhotoUrl} setUserPhotoUrl={setUserPhotoUrl} userName={userName} setUserName={setUserName} userBio={userBio} setUserBio={setUserBio} onLogout={onLogout} />
-          </div>
+          </motion.div>
         ) : activeNav === 'Juegos' ? (
-          <div className={`flex-1 overflow-y-auto custom-scrollbar ${darkMode ? 'bg-[#070D1C]' : 'bg-[#F5F0E8]'}`}>
-            <GamesSection darkMode={darkMode} />
-          </div>
+          <motion.div key="Juegos" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.25, ease: 'easeInOut' }} className={`flex-1 overflow-y-auto custom-scrollbar ${darkMode ? 'bg-[#070D1C]' : 'bg-[#F5F0E8]'}`}>
+            <GamesSection darkMode={darkMode} onToast={triggerToast} />
+          </motion.div>
         ) : activeNav === 'Habla con tu psicólogo' ? (
-          <PsicologoSection darkMode={darkMode} />
+          <motion.div key="Psicologo" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.25, ease: 'easeInOut' }} className={`flex-1 overflow-y-auto custom-scrollbar ${darkMode ? 'bg-[#070D1C]' : 'bg-[#F5F0E8]'}`}>
+            <PsicologoSection darkMode={darkMode} />
+          </motion.div>
         ) : activeNav === 'Recordatorios' ? (
-          <div className={`flex-1 overflow-y-auto custom-scrollbar ${darkMode ? 'bg-[#1a1a2e]' : 'bg-[#F5F0E8]'}`}>
+          <motion.div key="Recordatorios" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.25, ease: 'easeInOut' }} className={`flex-1 overflow-y-auto custom-scrollbar ${darkMode ? 'bg-[#1a1a2e]' : 'bg-[#F5F0E8]'}`}>
             <RemindersSection darkMode={darkMode} />
-          </div>
+          </motion.div>
         ) : (
-          <div style={{
+          <motion.div key="Inicio" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.25, ease: 'easeInOut' }} style={{
             flex: 1, overflowY: 'auto', fontFamily: "'Inter', sans-serif",
-            background: darkMode ? '#070D1C' : '#F5F0E8'
+            background: darkMode ? '#070D1C' : '#f7f3ee'
           }} className="custom-scrollbar">
-            <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '44px 48px' }}>
+            <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '48px 64px' }}>
 
               {/* ═══ HEADER ═══ */}
-              <header style={{ marginBottom: '36px' }}>
+              <header style={{ marginBottom: '48px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                   <span style={{
                     width: '7px', height: '7px', borderRadius: '50%',
@@ -3917,7 +4104,7 @@ export default function DashboardEscritorio({ onLogout }) {
                   color: darkMode ? '#F1F5F9' : '#0F172A', margin: 0,
                   fontFamily: "'Poppins', sans-serif", lineHeight: 1.1
                 }}>
-                  Hola de nuevo, Miguel <span style={{ color: '#EC4899' }}>♥</span>
+                  Hola de nuevo, {userName || 'Usuario'} <span style={{ color: '#EC4899' }}>♥</span>
                 </h1>
                 <p style={{
                   fontSize: '18px', fontWeight: 500, color: darkMode ? '#64748B' : '#94A3B8',
@@ -3926,13 +4113,13 @@ export default function DashboardEscritorio({ onLogout }) {
               </header>
 
               {/* ═══ GRID PRINCIPAL ═══ */}
-              <div style={{ display: 'grid', gridTemplateColumns: '400px 1fr', gap: '24px', alignItems: 'start' }} className="inicio-grid">
+              <div style={{ display: 'grid', gridTemplateColumns: '420px 1fr', gap: '32px', alignItems: 'start' }} className="inicio-grid">
                 <style>{`
                   @media (max-width: 900px) { .inicio-grid { grid-template-columns: 1fr !important; } }
                 `}</style>
 
                 {/* ═══ COLUMNA IZQUIERDA ═══ */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
 
                   {/* ── MASCOTA ── */}
                   <div style={{
@@ -3956,117 +4143,302 @@ export default function DashboardEscritorio({ onLogout }) {
                             <span style={{ fontSize: '36px', fontWeight: 700, color: '#F9A8D4', textShadow: '0 2px 8px rgba(249,168,212,0.4)' }}>Zzz</span>
                           </motion.div>
                         )}
+                        {!isSleeping && sleep < 30 && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.85, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            transition={{ duration: 0.45, ease: [0.23, 1, 0.32, 1] }}
+                            style={{ position: 'absolute', top: '-46px', left: '56%', right: 'auto', zIndex: 25, width: '60%', maxWidth: '200px', minWidth: '140px' }}
+                          >
+                            <div style={{
+                              background: darkMode
+                                ? 'linear-gradient(135deg, #3A1F33 0%, #2A1830 100%)'
+                                : 'linear-gradient(135deg, #FFF5F7 0%, #FFE4EE 100%)',
+                              borderRadius: '20px',
+                              padding: '16px 16px 14px',
+                              boxShadow: darkMode
+                                ? '0 12px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(236,72,153,0.15)'
+                                : '0 12px 32px rgba(236,72,153,0.12), 0 2px 8px rgba(236,72,153,0.08)',
+                              border: darkMode
+                                ? '1.5px solid rgba(244,114,182,0.45)'
+                                : '1.5px solid rgba(244,114,182,0.4)',
+                              position: 'relative',
+                              display: 'flex',
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '10px',
+                            }}>
+
+                              {/* Mascot avatar circle */}
+                              <div style={{
+                                width: '40px', height: '40px', borderRadius: '50%',
+                                background: darkMode
+                                  ? 'linear-gradient(135deg, rgba(252,231,243,0.18) 0%, rgba(251,207,232,0.08) 100%)'
+                                  : 'linear-gradient(135deg, #FCE7F3 0%, #FBCFE8 100%)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                flexShrink: 0, border: '2px solid rgba(244,114,182,0.3)',
+                              }}>
+                                <SafetyMascot size={30} mascotId={currentMascotId} sleeping={false} outfit={petOutfit} />
+                              </div>
+
+                              {/* Text */}
+                              <span style={{
+                                flex: 1,
+                                fontSize: '14px', fontWeight: 700,
+                                fontFamily: "'Poppins', sans-serif",
+                                color: darkMode ? '#F9A8D4' : '#BE185D', letterSpacing: '-0.01em', lineHeight: 1.35,
+                                textAlign: 'center',
+                                whiteSpace: 'normal',
+                                wordBreak: 'break-word',
+                              }}>
+                                {sleep < 10 ? '¡Mándame a dormir!' : 'Tengo sueño...'}
+                              </span>
+
+                              {/* Zzz badge flotante */}
+                              <motion.div
+                                animate={{ y: [0, -3, 0], rotate: [0, 5, 0] }}
+                                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                                style={{
+                                  position: 'absolute', top: '-12px', right: '-10px', zIndex: 10,
+                                  width: '30px', height: '30px', borderRadius: '50%',
+                                  background: 'linear-gradient(135deg, #EC4899 0%, #F472B6 100%)',
+                                  boxShadow: '0 3px 12px rgba(236,72,153,0.35)',
+                                  border: darkMode ? '2px solid #111A2E' : '2px solid #FFFFFF',
+                                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                }}
+                              >
+                                <span style={{ fontSize: '11px', fontWeight: 800, color: '#FFFFFF', fontFamily: "'Poppins', sans-serif", lineHeight: 1 }}>Zz</span>
+                              </motion.div>
+                            </div>
+
+                            {/* Punta curva hacia la mascota (abajo-izquierda) */}
+                            <div style={{
+                              position: 'absolute', bottom: '-8px', left: '30px',
+                              width: '16px', height: '16px',
+                              background: darkMode ? '#2E1A2C' : '#FFE9F1',
+                              borderRight: darkMode
+                                ? '1.5px solid rgba(244,114,182,0.45)'
+                                : '1.5px solid rgba(244,114,182,0.4)',
+                              borderBottom: darkMode
+                                ? '1.5px solid rgba(244,114,182,0.45)'
+                                : '1.5px solid rgba(244,114,182,0.4)',
+                              borderRadius: '0 0 5px 0',
+                              transform: 'rotate(45deg) skew(8deg, 8deg)',
+                            }} />
+                          </motion.div>
+                        )}
+                        {!isSleeping && hunger < 30 && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.85, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            transition={{ duration: 0.45, ease: [0.23, 1, 0.32, 1] }}
+                            style={{ position: 'absolute', top: '-46px', right: '56%', left: 'auto', zIndex: 25, width: '60%', maxWidth: '200px', minWidth: '140px' }}
+                          >
+                            <div style={{
+                              background: darkMode
+                                ? 'linear-gradient(135deg, #3A2A1A 0%, #2A2018 100%)'
+                                : 'linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)',
+                              borderRadius: '20px',
+                              padding: '16px 16px 14px',
+                              boxShadow: darkMode
+                                ? '0 12px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(249,115,22,0.12)'
+                                : '0 12px 32px rgba(249,115,22,0.12), 0 2px 8px rgba(249,115,22,0.08)',
+                              border: darkMode
+                                ? '1.5px solid rgba(251,146,60,0.45)'
+                                : '1.5px solid rgba(251,146,60,0.4)',
+                              position: 'relative',
+                              display: 'flex',
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '10px',
+                            }}>
+
+                              {/* Mascot avatar circle */}
+                              <div style={{
+                                width: '40px', height: '40px', borderRadius: '50%',
+                                background: darkMode
+                                  ? 'linear-gradient(135deg, rgba(254,243,199,0.18) 0%, rgba(253,230,138,0.08) 100%)'
+                                  : 'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                flexShrink: 0, border: '2px solid rgba(251,146,60,0.3)',
+                              }}>
+                                <SafetyMascot size={30} mascotId={currentMascotId} sleeping={false} outfit={petOutfit} />
+                              </div>
+
+                              {/* Text */}
+                              <span style={{
+                                flex: 1,
+                                fontSize: '14px', fontWeight: 700,
+                                fontFamily: "'Poppins', sans-serif",
+                                color: darkMode ? '#FDBA74' : '#9A3412', letterSpacing: '-0.01em', lineHeight: 1.35,
+                                textAlign: 'center',
+                                whiteSpace: 'normal',
+                                wordBreak: 'break-word',
+                              }}>
+                                {hunger < 10 ? '¡Dame de comer ya!' : 'Tengo hambre...'}
+                              </span>
+
+                              {/* Icono comida flotante */}
+                              <motion.div
+                                animate={{ y: [0, -3, 0], rotate: [0, 5, 0] }}
+                                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                                style={{
+                                  position: 'absolute', top: '-12px', left: '-10px', zIndex: 10,
+                                  width: '28px', height: '28px', borderRadius: '50%',
+                                  background: 'linear-gradient(135deg, #F97316 0%, #FB923C 100%)',
+                                  boxShadow: '0 3px 12px rgba(249,115,22,0.35)',
+                                  border: darkMode ? '2px solid #111A2E' : '2px solid #FFFFFF',
+                                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                }}
+                              >
+                                <span style={{ fontSize: '13px', lineHeight: 1 }}>🍽️</span>
+                              </motion.div>
+                            </div>
+
+                            {/* Punta curva hacia la mascota (abajo-derecha) */}
+                            <div style={{
+                              position: 'absolute', bottom: '-8px', right: '30px',
+                              width: '16px', height: '16px',
+                              background: darkMode ? '#33251A' : '#FFEDD5',
+                              borderRight: darkMode
+                                ? '1.5px solid rgba(251,146,60,0.45)'
+                                : '1.5px solid rgba(251,146,60,0.4)',
+                              borderBottom: darkMode
+                                ? '1.5px solid rgba(251,146,60,0.45)'
+                                : '1.5px solid rgba(251,146,60,0.4)',
+                              borderRadius: '0 0 5px 0',
+                              transform: 'rotate(45deg) skew(-8deg, -8deg)',
+                            }} />
+                          </motion.div>
+                        )}
                         {feedAnimations.map((anim) => (
                           <motion.div
                             key={anim.id}
                             initial={{ opacity: 1, y: 0, scale: 0.5 }}
                             animate={{ opacity: 0, y: -60, scale: 1.2 }}
-                            transition={{ duration: anim.type === 'chicken' ? 1.2 : 1.4, ease: 'easeOut' }}
-                            style={{ position: 'absolute', zIndex: 30, pointerEvents: 'none', left: anim.type === 'chicken' ? '35%' : '65%', bottom: '40%' }}
+                            transition={{ duration: anim.type === 'food' ? 1.2 : 1.4, ease: 'easeOut' }}
+                            style={{ position: 'absolute', zIndex: 30, pointerEvents: 'none', left: anim.type === 'food' ? '35%' : '65%', bottom: '40%' }}
                           >
-                            <span style={{ fontSize: '32px' }}>{anim.type === 'chicken' ? '🍗' : '+20 exp'}</span>
+                            <span style={{ fontSize: '32px' }}>{anim.type === 'food' ? getFoodEmoji(anim.foodId) : '+20 exp'}</span>
                           </motion.div>
                         ))}
                       </div>
                     </div>
                   </div>
 
-                  {/* ── ESTADO DE KOKO ── */}
-                  <div style={{
-                    borderRadius: '24px', padding: '28px',
-                    background: darkMode ? 'rgba(255,255,255,0.03)' : '#FFFFFF',
-                    border: `1px solid ${darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'}`,
-                    boxShadow: '0 8px 30px rgba(15,23,42,0.04)'
-                  }}>
-                    {/* Header */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                        <div style={{
-                          width: '40px', height: '40px', borderRadius: '50%',
-                          background: darkMode ? 'rgba(236,72,153,0.12)' : '#FFF5FA',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center'
-                        }}>
-                          <span style={{ color: '#EC4899', fontWeight: 700, fontSize: '12px' }}>Lv.{mascotLevel}</span>
+                  {/* ── ESTADO DE MASCOTA · Tarjeta de estado (grande) ── */}
+                  <div
+                    className={darkMode ? 'w-full p-8 rounded-3xl space-y-6 border border-white/10 bg-white/[0.04] backdrop-blur-md shadow-sm' : 'w-full p-8 bg-white rounded-3xl shadow-sm border border-gray-100/80 space-y-6'}
+                    style={{ fontFamily: "'Plus Jakarta Sans','Inter',sans-serif" }}
+                  >
+                    {/* Encabezado: nombre + nivel + cambiar + burbuja de estado */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <h3 className={`text-2xl font-extrabold tracking-tight truncate ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>
+                            {(getMascotById(currentMascotId) || {}).name || 'Milo'}
+                          </h3>
+                          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-pink-500 to-violet-500 pl-2.5 pr-3 py-1.5 rounded-full shadow-lg shadow-pink-500/25 whitespace-nowrap">
+                            <Sparkles size={14} strokeWidth={2.5} />
+                            Nivel {mascotLevel}
+                          </span>
                         </div>
-                        <span style={{ fontWeight: 700, fontSize: '16px', color: darkMode ? '#F1F5F9' : '#0F172A' }}>
-                          {(getMascotById(currentMascotId) || {}).name || 'Bumi'}
+                        <button
+                          onClick={() => setShowMascotSelector(true)}
+                          aria-label="Cambiar mascota"
+                          title="Cambiar mascota"
+                          className={`inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-full transition-all duration-200 cursor-pointer border-0 ${darkMode ? 'bg-white/[0.06] text-slate-300 hover:bg-pink-500/20 hover:text-pink-300' : 'bg-slate-100/80 text-slate-500 hover:bg-pink-50 hover:text-pink-600'}`}
+                          style={{ fontFamily: 'inherit' }}
+                        >
+                          <RefreshCw size={15} strokeWidth={2.5} />
+                          Cambiar
+                        </button>
+                      </div>
+                      <div className={`flex items-start gap-4 rounded-2xl px-5 py-4 border ${happinessValue < 40
+                        ? (darkMode ? 'bg-gradient-to-r from-rose-500/10 to-amber-500/10 border-rose-400/20' : 'bg-gradient-to-r from-rose-50 to-amber-50 border-rose-100/80')
+                        : (darkMode ? 'bg-gradient-to-r from-emerald-500/10 to-sky-500/10 border-emerald-400/20' : 'bg-gradient-to-r from-emerald-50 via-teal-50 to-sky-50 border-emerald-100/70')}`}>
+                        <span className={`flex items-center justify-center w-11 h-11 rounded-full shrink-0 ${happinessValue < 20
+                          ? 'bg-rose-500/15 text-rose-500'
+                          : happinessValue < 40
+                            ? 'bg-amber-500/15 text-amber-500'
+                            : 'bg-emerald-500/15 text-emerald-500'}`}>
+                          {happinessValue < 20
+                            ? <Frown size={20} strokeWidth={2.2} />
+                            : happinessValue < 40
+                              ? <Meh size={20} strokeWidth={2.2} />
+                              : <Smile size={20} strokeWidth={2.2} />}
+                        </span>
+                        <p className={`text-[15px] leading-snug font-medium ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                          {getPetMoodMessage(happinessValue)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Sección Experiencia (XP) */}
+                    <div>
+                      <div className="flex justify-between items-center text-sm font-semibold">
+                        <span className={`tracking-[0.08em] uppercase ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>Experiencia</span>
+                        <span className={darkMode ? 'text-slate-400' : 'text-slate-500'}>
+                          Nivel {mascotLevel} • {mascotXp} / {mascotLevel * 120} XP ({Math.min(100, Math.round((mascotXp / (mascotLevel * 120)) * 100))}%)
                         </span>
                       </div>
-                      <button onClick={() => setShowMascotSelector(true)} style={{
-                        fontSize: '13px', fontWeight: 600, color: '#EC4899',
-                        padding: '6px 14px', borderRadius: '10px', border: 'none', cursor: 'pointer',
-                        background: darkMode ? 'rgba(236,72,153,0.1)' : '#FFF5FA',
-                        transition: 'all 150ms ease', fontFamily: 'inherit'
-                      }}
-                        onMouseEnter={(e) => e.currentTarget.style.background = darkMode ? 'rgba(236,72,153,0.18)' : '#FFE4F0'}
-                        onMouseLeave={(e) => e.currentTarget.style.background = darkMode ? 'rgba(236,72,153,0.1)' : '#FFF5FA'}
-                      >
-                        Cambiar mascota
-                      </button>
-                    </div>
-                    <p style={{ fontSize: '14px', color: darkMode ? '#64748B' : '#94A3B8', margin: '0 0 20px' }}>
-                      Estoy muy feliz de verte hoy! 😊
-                    </p>
-
-                    {/* Experiencia */}
-                    <div style={{ marginBottom: '22px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.06em', color: darkMode ? '#475569' : '#94A3B8', textTransform: 'uppercase' }}>Experiencia</span>
-                        <span style={{ fontSize: '13px', fontWeight: 700, color: darkMode ? '#64748B' : '#94A3B8' }}>Nv.{mascotLevel} — {mascotXp}/100</span>
-                      </div>
-                      <div style={{
-                        height: '8px', borderRadius: '4px',
-                        background: darkMode ? 'rgba(255,255,255,0.06)' : '#F1F5F9',
-                        overflow: 'hidden'
-                      }}>
-                        <div style={{ height: '100%', background: '#EC4899', borderRadius: '4px', transition: 'width 500ms ease', width: `${mascotXp}%` }} />
+                      <div className={`h-3.5 w-full rounded-full overflow-hidden mt-2 ${darkMode ? 'bg-white/[0.07]' : 'bg-gray-100'}`}>
+                        <div
+                          className="bg-indigo-500 h-full rounded-full transition-all duration-500"
+                          style={{ width: `${Math.min(100, (mascotXp / (mascotLevel * 120)) * 100)}%` }}
+                        />
                       </div>
                     </div>
 
-                    {/* Stats */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
+                    {/* Barras Vitales · un bloque independiente por estadística */}
+                    <div className="space-y-5">
                       {[
-                        { icon: '😊', label: 'Hambre', value: hunger, color: '#F97316', bg: darkMode ? 'rgba(249,115,22,0.1)' : '#FFF7ED' },
-                        { icon: '⚡', label: 'Sueño', value: sleep, color: '#3B82F6', bg: darkMode ? 'rgba(59,130,246,0.1)' : '#EFF6FF' },
-                        { icon: '🎮', label: 'Diversión', value: fun, color: '#8B5CF6', bg: darkMode ? 'rgba(139,92,246,0.1)' : '#F5F3FF' },
+                        { Icon: Utensils, label: 'Hambre', value: hunger, desc: 'Nivel de saciedad', alert: '¡Necesita comer ya!', bar: 'from-rose-500 to-pink-400', chip: 'bg-rose-500/10 text-rose-500', pct: 'text-rose-500', glow: 'shadow-[0_0_10px_rgba(244,63,94,0.35)]' },
+                        { Icon: Moon, label: 'Sueño', value: sleep, desc: 'Calidad del descanso', alert: '¡Necesita dormir!', bar: 'from-blue-500 to-sky-400', chip: 'bg-blue-500/10 text-blue-500', pct: 'text-blue-500', glow: 'shadow-[0_0_10px_rgba(59,130,246,0.35)]' },
+                        { Icon: Gamepad, label: 'Diversión', value: fun, desc: 'Tiempo de juego', alert: '¡Quiere jugar!', bar: 'from-violet-500 to-purple-400', chip: 'bg-violet-500/10 text-violet-500', pct: 'text-violet-500', glow: 'shadow-[0_0_10px_rgba(139,92,246,0.35)]' },
                       ].map((stat) => (
-                        <div key={stat.label}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                            <span style={{ fontSize: '14px', fontWeight: 600, color: darkMode ? '#CBD5E1' : '#475569', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <span>{stat.icon}</span> {stat.label}
-                            </span>
-                            <span style={{ fontSize: '14px', fontWeight: 700, color: stat.color }}>{stat.value}%</span>
+                        <div key={stat.label} className={darkMode ? 'p-5 rounded-2xl border border-white/10 bg-white/[0.04]' : 'p-5 bg-gray-50/60 rounded-2xl border border-gray-100'}>
+                          <div className="flex items-center justify-between mb-2.5">
+                            <div className="flex items-center gap-4 min-w-0">
+                              <span className={`flex items-center justify-center w-12 h-12 rounded-full shrink-0 ${stat.chip}`}>
+                                <stat.Icon size={20} strokeWidth={2.2} />
+                              </span>
+                              <span className="min-w-0">
+                                <span className={`block text-base font-bold truncate ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>{stat.label}</span>
+                                <span className={`block text-sm truncate ${stat.value <= 20 ? 'text-rose-500 font-bold' : (darkMode ? 'text-slate-500 font-medium' : 'text-slate-400 font-medium')}`}>
+                                  {stat.value <= 20 ? stat.alert : stat.desc}
+                                </span>
+                              </span>
+                            </div>
+                            <span className={`text-2xl font-bold shrink-0 ${stat.value <= 20 ? 'text-rose-500' : stat.pct}`}>{stat.value}%</span>
                           </div>
-                          <div style={{
-                            height: '8px', borderRadius: '4px',
-                            background: darkMode ? 'rgba(255,255,255,0.06)' : '#F1F5F9',
-                            overflow: 'hidden'
-                          }}>
-                            <div style={{ height: '100%', background: stat.color, borderRadius: '4px', transition: 'width 500ms ease', width: `${stat.value}%` }} />
+                          <div className={`h-3 w-full rounded-full overflow-hidden mb-1 ${darkMode ? 'bg-white/[0.07]' : 'bg-gray-200/70'}`}>
+                            <div
+                              className={`h-full rounded-full bg-gradient-to-r ${stat.bar} transition-all duration-500 ${stat.value <= 20 ? stat.glow : ''}`}
+                              style={{ width: `${Math.max(0, Math.min(100, stat.value))}%` }}
+                            />
                           </div>
                         </div>
                       ))}
                     </div>
 
-                    {/* Indicadores */}
-                    <div style={{
-                      display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px',
-                      paddingTop: '22px',
-                      borderTop: `1px solid ${darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'}`
-                    }}>
+                    {/* Tarjetas inferiores */}
+                    <div className="grid grid-cols-3 gap-3">
                       {[
-                        { icon: '😊', label: 'Felicidad', value: 'Alta', bg: darkMode ? 'rgba(249,115,22,0.1)' : '#FFF7ED', color: '#F97316' },
-                        { icon: '⚡', label: 'Energía', value: 'Media', bg: darkMode ? 'rgba(59,130,246,0.1)' : '#EFF6FF', color: '#3B82F6' },
-                        { icon: '💚', label: 'Afecto', value: 'Max', bg: darkMode ? 'rgba(34,197,94,0.1)' : '#F0FDF4', color: '#22C55E' },
+                        { Icon: Smile, label: 'Felicidad', status: happinessLevel, score: happinessValue, card: darkMode ? 'bg-amber-500/[0.08] border-white/[0.06]' : 'bg-amber-50 border-amber-100', chip: 'bg-amber-500/15 text-amber-600', text: 'text-amber-600' },
+                        { Icon: Zap, label: 'Energía', status: energyLevel, score: energyValue, card: darkMode ? 'bg-blue-500/[0.08] border-white/[0.06]' : 'bg-blue-50 border-blue-100', chip: 'bg-blue-500/15 text-blue-600', text: 'text-blue-600' },
+                        { Icon: Heart, label: 'Afecto', status: affectionLevel, score: affectionValue, card: darkMode ? 'bg-rose-500/[0.08] border-white/[0.06]' : 'bg-rose-50 border-rose-100', chip: 'bg-rose-500/15 text-rose-500', text: 'text-rose-500' },
                       ].map((ind) => (
-                        <div key={ind.label} style={{
-                          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
-                          padding: '14px 8px', borderRadius: '16px', background: ind.bg, textAlign: 'center'
-                        }}>
-                          <span style={{ fontSize: '20px' }}>{ind.icon}</span>
+                        <div key={ind.label} className={`flex flex-col items-center gap-2 rounded-2xl p-5 border text-center ${ind.card}`}>
+                          <span className={`flex items-center justify-center w-12 h-12 rounded-full ${ind.chip}`}>
+                            <ind.Icon size={22} strokeWidth={2.2} />
+                          </span>
                           <div>
-                            <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', color: darkMode ? '#475569' : '#94A3B8', textTransform: 'uppercase', margin: '0 0 2px' }}>{ind.label}</p>
-                            <p style={{ fontSize: '15px', fontWeight: 700, color: ind.color, margin: 0 }}>{ind.value}</p>
+                            <p className={`text-[11px] font-bold tracking-[0.1em] uppercase ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>{ind.label}</p>
+                            <p className={`text-lg font-extrabold leading-tight ${ind.text}`}>{ind.status}</p>
+                            <p className={`text-xs font-semibold ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>{ind.score}%</p>
                           </div>
                         </div>
                       ))}
@@ -4075,7 +4447,7 @@ export default function DashboardEscritorio({ onLogout }) {
                 </div>
 
                 {/* ═══ COLUMNA DERECHA ═══ */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
 
                   {/* ── RACHA ── */}
                   <div style={{
@@ -4114,8 +4486,8 @@ export default function DashboardEscritorio({ onLogout }) {
                             </linearGradient>
                           </defs>
                         </svg>
-                        <motion.div key={loginStreak} initial={{ scale: 1.5, rotate: -6 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 320, damping: 12 }} style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#fff', paddingTop: '4px' }}>
-                          <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', opacity: 0.9, textTransform: 'uppercase' }}>Días</span>
+                        <motion.div key={loginStreak} initial={{ scale: 1.5, rotate: -6 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 320, damping: 12 }} style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', color: '#fff', paddingTop: '6px' }}>
+                          <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.06em', opacity: 0.9, textTransform: 'uppercase', marginBottom: '0px' }}>Días</span>
                           <span style={{ fontSize: '22px', fontWeight: 900, lineHeight: 1, textShadow: '0 1px 3px rgba(0,0,0,0.15)' }}>{loginStreak}</span>
                         </motion.div>
                       </div>
@@ -4243,71 +4615,261 @@ export default function DashboardEscritorio({ onLogout }) {
                   </div>
 
                   {/* ── TU COMPAÑERO ESTÁ AQUÍ ── */}
-                  <div style={{
+                  <div className="rounded-3xl shadow-xl" style={{
                     borderRadius: '24px', padding: '32px', flex: 1,
-                    background: darkMode ? 'rgba(255,255,255,0.03)' : '#FFFFFF',
-                    border: `1px solid ${darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'}`,
-                    boxShadow: '0 8px 30px rgba(15,23,42,0.04)'
+                    background: darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.75)',
+                    backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+                    border: `1px solid ${darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.6)'}`,
+                    boxShadow: darkMode ? '0 12px 40px rgba(0,0,0,0.3)' : '0 12px 40px rgba(15,23,42,0.08)',
+                    fontFamily: "'Inter', sans-serif",
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '18px', marginBottom: '28px' }}>
-                      <div style={{
-                        width: '52px', height: '52px', borderRadius: '18px',
+                    <style>{`
+                      .companion-card { transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease, background 220ms ease; }
+                      .companion-card:not(:disabled):hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(15,23,42,0.10); }
+                      .companion-card:not(:disabled):hover .companion-icon { transform: scale(1.12); }
+                      .companion-icon { transition: transform 220ms ease; }
+                      @keyframes companion-pulse-dot { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.8); } }
+                      .companion-dot { animation: companion-pulse-dot 1.8s ease-in-out infinite; }
+                      @media (max-width: 640px) { .activities-grid { grid-template-columns: 1fr !important; } }
+                    `}</style>
+                    {(() => {
+                      const companionName = (getMascotById(currentMascotId) || {}).name || 'Milo';
+                      const petMood = happinessValue >= 60
+                        ? { label: 'feliz', dot: '#22C55E' }
+                        : happinessValue >= 40
+                          ? { label: 'contento', dot: '#84CC16' }
+                          : happinessValue >= 20
+                            ? { label: 'decaído', dot: '#F59E0B' }
+                            : { label: 'triste', dot: '#F43F5E' };
+                      const hasFood = ownedFood.length > 0;
+                      const firstFood = MARKET_ITEMS.find((i) => i.id === ownedFood[0]);
+                      const outfitLabel = (PET_OUTFITS.find((o) => o.id === petOutfit) || {}).label || '';
+                      const cardBase = {
+                        display: 'flex', alignItems: 'center', gap: '16px',
+                        padding: '18px 20px', borderRadius: '18px', textAlign: 'left',
+                        minHeight: '88px', fontFamily: 'inherit', width: '100%',
+                      };
+                      const pill = (bg, color) => ({
+                        display: 'inline-flex', alignItems: 'center', gap: '5px',
+                        padding: '4px 10px', borderRadius: '999px',
+                        fontSize: '11px', fontWeight: 700, background: bg, color,
+                        marginTop: '6px', whiteSpace: 'nowrap',
+                      });
+                      const iconBox = (bg) => ({
+                        width: '48px', height: '48px', borderRadius: '14px',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: darkMode ? 'rgba(236,72,153,0.1)' : '#FFF5FA',
-                        flexShrink: 0
-                      }}>
-                        <PawPrint size={26} style={{ color: '#EC4899' }} />
-                      </div>
-                      <div>
-                        <h3 style={{ fontWeight: 700, fontSize: '20px', color: darkMode ? '#F1F5F9' : '#0F172A', margin: 0, lineHeight: 1.2 }}>Tu compañero está aquí</h3>
-                        <p style={{ fontSize: '15px', color: darkMode ? '#64748B' : '#94A3B8', marginTop: '4px', margin: '4px 0 0' }}>Cuida de tu mascota para que esté siempre feliz contigo.</p>
-                      </div>
-                    </div>
+                        background: bg, flexShrink: 0,
+                        boxShadow: '0 2px 8px rgba(15,23,42,0.06)',
+                      });
+                      const stdCard = (bg, border) => ({
+                        ...cardBase, background: bg, border: `1px solid ${border}`,
+                        cursor: 'pointer', boxShadow: '0 2px 10px rgba(15,23,42,0.04)',
+                      });
+                      const playAction = () => { setActiveNav('MiniJuego'); setShowMascotGame(true); addXp(6); const mn = (getMascotById(currentMascotId) || {}).name || 'Bumi'; triggerToast(`¡${mn} está jugando! 🎉`); };
+                      const sleepAction = () => {
+                        if (isSleepLimited) { triggerToast(`Dormir bloqueado. Espera ${sleepTimeLeft} min ⏳`); return; }
+                        setIsSleeping(!isSleeping);
+                        const mn = (getMascotById(currentMascotId) || {}).name || 'Bumi';
+                        triggerToast(isSleeping ? `¡${mn} despertó! →` : `¡${mn} está durmiendo! 💤`);
+                        setActionLimits(prev => {
+                          const newCount = prev.sleepCount + 1;
+                          const updates = { ...prev, sleepCount: newCount };
+                          if (newCount >= MAX_ACTIONS) updates.sleepCooldownEnd = Date.now() + COOLDOWN_MS;
+                          try {
+                            const all = getAllActionLimits();
+                            all[currentMascotId] = updates;
+                            localStorage.setItem('pet_action_limits', JSON.stringify(all));
+                          } catch {}
+                          return updates;
+                        });
+                      };
+                      return (
+                        <>
+                          {/* Header + chip de estrellas */}
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', marginBottom: '10px', flexWrap: 'wrap' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+                              <div style={{
+                                width: '52px', height: '52px', borderRadius: '18px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                background: darkMode ? 'rgba(236,72,153,0.1)' : '#FFF5FA',
+                                flexShrink: 0
+                              }}>
+                                <PawPrint size={26} style={{ color: '#EC4899' }} />
+                              </div>
+                              <div>
+                                <h3 style={{ fontWeight: 700, fontSize: '20px', color: darkMode ? '#F1F5F9' : '#0F172A', margin: 0, lineHeight: 1.2 }}>Tu compañero está aquí</h3>
+                                <p style={{ fontSize: '15px', color: darkMode ? '#64748B' : '#94A3B8', marginTop: '4px', margin: '4px 0 0' }}>Cuida de tu mascota para que esté siempre feliz contigo.</p>
+                              </div>
+                            </div>
+                            <div style={{
+                              display: 'flex', alignItems: 'center', gap: '8px',
+                              padding: '9px 16px', borderRadius: '999px',
+                              background: darkMode ? 'rgba(245,158,11,0.1)' : 'linear-gradient(135deg, #FFFBEB, #FEF3C7)',
+                              border: '1px solid #FDE68A',
+                              boxShadow: darkMode ? 'none' : '0 4px 14px rgba(245,158,11,0.15)',
+                              flexShrink: 0,
+                            }}>
+                              <Star size={16} style={{ color: '#F59E0B' }} fill="currentColor" />
+                              <span style={{ fontSize: '14px', fontWeight: 800, color: darkMode ? '#FBBF24' : '#B45309' }}>{petStars} estrellas</span>
+                            </div>
+                          </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }} className="activities-grid">
-                      <style>{`
-                        @media (max-width: 640px) { .activities-grid { grid-template-columns: 1fr !important; } }
-                      `}</style>
-                      {[
-                        { onClick: () => {
-                            setHunger((prev) => Math.min(100, prev + 20));
-                            addXp(20);
-                            const id = Date.now();
-                            setFeedAnimations((prev) => [...prev, { id, type: 'chicken' }]);
-                            setTimeout(() => setFeedAnimations((prev) => prev.filter((a) => a.id !== id)), 1200);
-                            const expId = Date.now() + 1;
-                            setFeedAnimations((prev) => [...prev, { id: expId, type: 'exp' }]);
-                            setTimeout(() => setFeedAnimations((prev) => prev.filter((a) => a.id !== expId)), 1400);
-                          }, icon: '🍗', label: 'Alimentar', sub: 'Dale algo rico', bg: darkMode ? 'rgba(249,115,22,0.08)' : '#FFF7ED', color: '#F97316' },
-                        { onClick: () => { setActiveNav('MiniJuego'); setShowMascotGame(true); addXp(15); const mn = (getMascotById(currentMascotId) || {}).name || 'Bumi'; triggerToast(`¡${mn} está jugando! 🎉`); }, icon: '⚽', label: 'Jugar', sub: 'Diviértanse juntos', bg: darkMode ? 'rgba(139,92,246,0.08)' : '#F5F3FF', color: '#8B5CF6' },
-                        { onClick: () => { setIsSleeping(!isSleeping); const mn = (getMascotById(currentMascotId) || {}).name || 'Bumi'; triggerToast(isSleeping ? `¡${mn} despertó! →` : `¡${mn} está durmiendo! 💤`); }, icon: '🌙', label: isSleeping ? 'Despertar' : 'Dormir', sub: isSleeping ? 'Que vuelva a la acción' : 'Que descanse', bg: darkMode ? 'rgba(59,130,246,0.08)' : '#EFF6FF', color: '#3B82F6' },
-                        { onClick: () => setShowWardrobe(!showWardrobe), icon: '👕', label: petOutfit ? 'Cambiar ropa' : 'Vestir', sub: petOutfit ? `Lleva: ${(PET_OUTFITS.find((o) => o.id === petOutfit) || {}).label || ''}` : `Elige ropa para ${(getMascotById(currentMascotId) || {}).name || 'Bumi'}`, bg: darkMode ? 'rgba(236,72,153,0.08)' : '#FFF5FA', color: '#EC4899' },
-                      ].map((action) => (
-                        <button key={action.label} onClick={action.onClick} style={{
-                          display: 'flex', alignItems: 'center', gap: '16px',
-                          padding: '18px 20px', borderRadius: '18px', border: 'none',
-                          background: action.bg, cursor: 'pointer', textAlign: 'left',
-                          transition: 'all 200ms ease', minHeight: '84px', fontFamily: 'inherit'
-                        }}
-                          onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
-                          onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                        >
-                          <div style={{
-                            width: '48px', height: '48px', borderRadius: '16px',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            background: darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.8)',
-                            flexShrink: 0, fontSize: '22px',
-                            boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
-                          }}>
-                            {action.icon}
+                          {/* Badge de estado */}
+                          <div style={{ marginBottom: '24px' }}>
+                            <span style={{
+                              display: 'inline-flex', alignItems: 'center', gap: '8px',
+                              padding: '6px 14px', borderRadius: '999px',
+                              fontSize: '13px', fontWeight: 600,
+                              background: darkMode ? 'rgba(255,255,255,0.04)' : '#F8FAFC',
+                              border: darkMode ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(15,23,42,0.07)',
+                              color: darkMode ? '#CBD5E1' : '#475569',
+                            }}>
+                              <span className="companion-dot" style={{ width: '9px', height: '9px', borderRadius: '50%', background: petMood.dot, boxShadow: `0 0 8px ${petMood.dot}` }} />
+                              {companionName} está {petMood.label}
+                            </span>
                           </div>
-                          <div style={{ minWidth: 0 }}>
-                            <p style={{ fontWeight: 700, fontSize: '16px', color: darkMode ? '#F1F5F9' : '#0F172A', margin: 0 }}>{action.label}</p>
-                            <p style={{ fontSize: '14px', marginTop: '2px', color: darkMode ? '#64748B' : '#94A3B8', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{action.sub}</p>
+
+                          {/* Grid de acciones */}
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }} className="activities-grid">
+                            {hasFood ? (
+                              <button key="alimentar" onClick={feedPet} className="companion-card" style={stdCard(darkMode ? 'rgba(249,115,22,0.07)' : '#FFF7ED', darkMode ? 'rgba(249,115,22,0.2)' : 'rgba(249,115,22,0.16)')}>
+                                <span className="companion-icon" style={iconBox(darkMode ? 'rgba(249,115,22,0.14)' : '#FFEDD5')}>
+                                  <UtensilsCrossed size={22} style={{ color: '#F97316' }} />
+                                </span>
+                                <span style={{ minWidth: 0 }}>
+                                  <span style={{ display: 'block', fontWeight: 700, fontSize: '16px', color: darkMode ? '#F1F5F9' : '#0F172A' }}>Alimentar</span>
+                                  <span style={{ display: 'block', fontSize: '13px', marginTop: '2px', color: darkMode ? '#64748B' : '#94A3B8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ownedFood.length} comida(s) disponible(s)</span>
+                                  <span style={pill(darkMode ? 'rgba(249,115,22,0.14)' : '#FFEDD5', '#EA580C')}>+{firstFood ? firstFood.hunger : ''} hambre</span>
+                                </span>
+                              </button>
+                            ) : (
+                              <div key="alimentar" className="companion-card" style={{
+                                ...cardBase, cursor: 'default',
+                                background: darkMode ? 'rgba(255,255,255,0.02)' : '#F8FAFC',
+                                border: darkMode ? '1px dashed rgba(255,255,255,0.1)' : '1px dashed rgba(15,23,42,0.14)',
+                                opacity: 0.9,
+                              }}>
+                                <span className="companion-icon" style={iconBox(darkMode ? 'rgba(255,255,255,0.05)' : '#F1F5F9')}>
+                                  <Lock size={22} style={{ color: darkMode ? '#475569' : '#94A3B8' }} />
+                                </span>
+                                <span style={{ minWidth: 0, flex: 1 }}>
+                                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <span style={{ fontWeight: 700, fontSize: '16px', color: darkMode ? '#94A3B8' : '#64748B' }}>Alimentar</span>
+                                    <span style={pill(darkMode ? 'rgba(255,255,255,0.06)' : '#F1F5F9', darkMode ? '#64748B' : '#64748B')}>Bloqueado</span>
+                                  </span>
+                                  <span style={{ display: 'block', fontSize: '13px', marginTop: '2px', color: darkMode ? '#475569' : '#94A3B8' }}>Sin comida en el inventario</span>
+                                  <button
+                                    onClick={() => setShowMarket(true)}
+                                    className="transition-all duration-200"
+                                    style={{
+                                      marginTop: '8px', padding: '7px 14px', borderRadius: '10px', border: 'none', cursor: 'pointer',
+                                      background: darkMode ? 'rgba(245,158,11,0.12)' : '#FFFBEB',
+                                      color: '#B45309', fontSize: '12px', fontWeight: 700, fontFamily: 'inherit',
+                                    }}
+                                  >
+                                    Ir a comprar →
+                                  </button>
+                                </span>
+                              </div>
+                            )}
+
+                            <button key="jugar" onClick={playAction} className="companion-card" style={stdCard(darkMode ? 'rgba(139,92,246,0.07)' : '#F5F3FF', darkMode ? 'rgba(139,92,246,0.2)' : 'rgba(139,92,246,0.16)')}>
+                              <span className="companion-icon" style={iconBox(darkMode ? 'rgba(139,92,246,0.14)' : '#EDE9FE')}>
+                                <Gamepad2 size={22} style={{ color: '#8B5CF6' }} />
+                              </span>
+                              <span style={{ minWidth: 0 }}>
+                                <span style={{ display: 'block', fontWeight: 700, fontSize: '16px', color: darkMode ? '#F1F5F9' : '#0F172A' }}>Jugar</span>
+                                <span style={{ display: 'block', fontSize: '13px', marginTop: '2px', color: darkMode ? '#64748B' : '#94A3B8' }}>Diviértanse juntos</span>
+                                <span style={pill(darkMode ? 'rgba(139,92,246,0.14)' : '#EDE9FE', '#7C3AED')}>+ Diversión</span>
+                              </span>
+                            </button>
+
+                            <button key="dormir" onClick={sleepAction} className="companion-card" style={stdCard(darkMode ? 'rgba(59,130,246,0.07)' : '#EFF6FF', darkMode ? 'rgba(59,130,246,0.2)' : 'rgba(59,130,246,0.16)')}>
+                              <span className="companion-icon" style={iconBox(darkMode ? 'rgba(59,130,246,0.14)' : '#DBEAFE')}>
+                                {isSleeping
+                                  ? <Sun size={22} style={{ color: '#F59E0B' }} />
+                                  : <Moon size={22} style={{ color: '#3B82F6' }} />}
+                              </span>
+                              <span style={{ minWidth: 0 }}>
+                                <span style={{ display: 'block', fontWeight: 700, fontSize: '16px', color: darkMode ? '#F1F5F9' : '#0F172A' }}>{isSleeping ? 'Despertar' : 'Dormir'}</span>
+                                <span style={{ display: 'block', fontSize: '13px', marginTop: '2px', color: darkMode ? '#64748B' : '#94A3B8' }}>{isSleeping ? 'Que vuelva a la acción' : 'Que descanse'}</span>
+                                <span style={pill(darkMode ? 'rgba(59,130,246,0.14)' : '#DBEAFE', '#2563EB')}>{isSleeping ? 'Durmiendo Zzz' : 'Restaura energía'}</span>
+                              </span>
+                            </button>
+
+                            <button key="vestir" onClick={() => setShowWardrobe(!showWardrobe)} className="companion-card" style={stdCard(darkMode ? 'rgba(236,72,153,0.07)' : '#FFF5FA', darkMode ? 'rgba(236,72,153,0.2)' : 'rgba(236,72,153,0.16)')}>
+                              <span className="companion-icon" style={iconBox(darkMode ? 'rgba(236,72,153,0.14)' : '#FCE7F3')}>
+                                <Shirt size={22} style={{ color: '#EC4899' }} />
+                              </span>
+                              <span style={{ minWidth: 0 }}>
+                                <span style={{ display: 'block', fontWeight: 700, fontSize: '16px', color: darkMode ? '#F1F5F9' : '#0F172A' }}>{petOutfit ? 'Cambiar ropa' : 'Vestir'}</span>
+                                <span style={{ display: 'block', fontSize: '13px', marginTop: '2px', color: darkMode ? '#64748B' : '#94A3B8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{petOutfit ? `Lleva: ${outfitLabel}` : `Elige ropa para ${companionName}`}</span>
+                                <span style={pill(darkMode ? 'rgba(236,72,153,0.14)' : '#FCE7F3', '#DB2777')}>{petOutfit ? `Lleva: ${outfitLabel}` : 'Nuevo look'}</span>
+                              </span>
+                            </button>
+
+                            {/* Mercado extendido */}
+                            <div key="mercado" className="companion-card" style={{
+                              ...cardBase, gridColumn: '1 / -1', cursor: 'default',
+                              background: darkMode ? 'rgba(245,158,11,0.06)' : 'linear-gradient(135deg, #FFFBEB, #FEF3C7)',
+                              border: darkMode ? '1px solid rgba(245,158,11,0.2)' : '1px solid #FDE68A',
+                              boxShadow: darkMode ? 'none' : '0 4px 18px rgba(245,158,11,0.12)',
+                            }}>
+                              <span className="companion-icon" style={{
+                                width: '48px', height: '48px', borderRadius: '14px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                                background: 'linear-gradient(135deg, #F59E0B, #F97316)',
+                                boxShadow: '0 4px 12px rgba(245,158,11,0.3)',
+                              }}>
+                                <Store size={22} style={{ color: '#FFFFFF' }} />
+                              </span>
+                              <span style={{ minWidth: 0, flex: 1 }}>
+                                <span style={{ display: 'block', fontWeight: 700, fontSize: '16px', color: darkMode ? '#F1F5F9' : '#0F172A' }}>Mercado</span>
+                                <span style={{ display: 'block', fontSize: '13px', marginTop: '2px', color: darkMode ? '#64748B' : '#92400E' }}>Canjea estrellas por comida para {companionName}</span>
+                              </span>
+                              <button
+                                onClick={() => setShowMarket(!showMarket)}
+                                className="transition-all duration-200"
+                                style={{
+                                  padding: '10px 20px', borderRadius: '12px', border: 'none', cursor: 'pointer', flexShrink: 0,
+                                  background: darkMode ? 'rgba(245,158,11,0.14)' : '#FFFFFF',
+                                  color: '#B45309', fontSize: '13px', fontWeight: 800, fontFamily: 'inherit',
+                                  boxShadow: darkMode ? 'none' : '0 2px 8px rgba(245,158,11,0.2)',
+                                }}
+                                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
+                              >
+                                {showMarket ? 'Ocultar tienda' : 'Explorar Tienda →'}
+                              </button>
+                            </div>
                           </div>
-                        </button>
-                      ))}
-                    </div>
+                        </>
+                      );
+                    })()}
+
+                    {ownedFood.length > 0 && (
+                      <div style={{
+                        marginTop: '16px', padding: '14px 18px', borderRadius: '16px',
+                        background: darkMode ? 'rgba(249,115,22,0.06)' : '#FFF7ED',
+                        display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap'
+                      }}>
+                        <span style={{ fontSize: '13px', fontWeight: 700, color: darkMode ? '#F1F5F9' : '#0F172A' }}>🍽️ Tu inventario:</span>
+                        {(() => {
+                          const counts = {};
+                          ownedFood.forEach(f => { counts[f] = (counts[f] || 0) + 1; });
+                          return Object.entries(counts).map(([foodId, count]) => (
+                            <span key={foodId} style={{
+                              display: 'inline-flex', alignItems: 'center', gap: '4px',
+                              padding: '4px 10px', borderRadius: '10px',
+                              background: darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.8)',
+                              fontSize: '13px', fontWeight: 600, color: darkMode ? '#F1F5F9' : '#0F172A'
+                            }}>
+                              {getFoodEmoji(foodId)} {count}
+                            </span>
+                          ));
+                        })()}
+                      </div>
+                    )}
 
                     <AnimatePresence initial={false}>
                       {showWardrobe && (
@@ -4318,25 +4880,62 @@ export default function DashboardEscritorio({ onLogout }) {
                           transition={{ duration: 0.3, ease: 'easeInOut' }}
                           style={{ overflow: 'hidden' }}
                         >
+                          <MiloWardrobe
+                            mascotId={currentMascotId}
+                            mascotName={(getMascotById(currentMascotId) || {}).name || 'Milo'}
+                            currentOutfit={petOutfit}
+                            darkMode={darkMode}
+                            onSave={(id) => {
+                              const name = (getMascotById(currentMascotId) || {}).name || 'Milo';
+                              const label = (PET_OUTFITS.find((o) => o.id === id) || {}).label || '';
+                              setPetOutfit(id);
+                              triggerToast(id ? `${name} lleva ${label} 😊` : `Quitaste la ropa de ${name}`);
+                            }}
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    <AnimatePresence initial={false}>
+                      {showMarket && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.3, ease: 'easeInOut' }}
+                          style={{ overflow: 'hidden' }}
+                        >
                           <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: `1px solid ${darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'}` }}>
-                            <p style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: darkMode ? '#475569' : '#94A3B8', textAlign: 'center', margin: '0 0 16px' }}>
-                              Elige ropa para {(getMascotById(currentMascotId) || {}).name || 'Bumi'}
-                            </p>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
-                              {PET_OUTFITS.map((o) => {
-                                const active = petOutfit === o.id;
-                                const mascotName = (getMascotById(currentMascotId) || {}).name || 'Bumi';
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                              <p style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: darkMode ? '#475569' : '#94A3B8', margin: 0 }}>
+                                Mercado de alimentos
+                              </p>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: darkMode ? 'rgba(245,158,11,0.1)' : '#FFFBEB', padding: '6px 12px', borderRadius: '12px' }}>
+                                <span style={{ fontSize: '14px' }}>⭐</span>
+                                <span style={{ fontSize: '14px', fontWeight: 700, color: '#F59E0B' }}>{petStars}</span>
+                              </div>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+                              {MARKET_ITEMS.map(item => {
+                                const canBuy = petStars >= item.cost;
                                 return (
-                                  <button key={o.id ?? 'none'} onClick={() => { setPetOutfit(o.id); triggerToast(o.id ? `${mascotName} lleva ${o.label} 😊` : `Quitaste la ropa de ${mascotName}`); }} style={{
-                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
-                                    padding: '16px 8px', borderRadius: '14px', border: 'none', cursor: 'pointer',
-                                    background: active
-                                      ? (darkMode ? 'rgba(236,72,153,0.12)' : '#FFF5FA')
-                                      : (darkMode ? 'rgba(255,255,255,0.03)' : '#F8FAFC'),
-                                    transition: 'all 150ms ease', fontFamily: 'inherit'
+                                  <button key={item.id} onClick={() => buyFood(item)} disabled={!canBuy} style={{
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
+                                    padding: '14px 8px', borderRadius: '14px', border: 'none', cursor: canBuy ? 'pointer' : 'not-allowed',
+                                    background: canBuy
+                                      ? (darkMode ? 'rgba(245,158,11,0.06)' : '#FFFFFF')
+                                      : (darkMode ? 'rgba(255,255,255,0.02)' : '#F8FAFC'),
+                                    opacity: canBuy ? 1 : 0.5,
+                                    transition: 'all 150ms ease', fontFamily: 'inherit',
+                                    boxShadow: canBuy ? '0 2px 8px rgba(0,0,0,0.04)' : 'none',
                                   }}>
-                                    <span style={{ fontSize: '24px', lineHeight: 1 }}>{o.emoji}</span>
-                                    <span style={{ fontSize: '11px', fontWeight: 600, color: active ? '#EC4899' : (darkMode ? '#64748B' : '#94A3B8') }}>{o.label}</span>
+                                    <span style={{ fontSize: '28px', lineHeight: 1 }}>{item.emoji}</span>
+                                    <span style={{ fontSize: '11px', fontWeight: 700, color: darkMode ? '#F1F5F9' : '#0F172A' }}>{item.name}</span>
+                                    <span style={{ fontSize: '10px', fontWeight: 600, color: '#F59E0B', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                      ⭐ {item.cost}
+                                    </span>
+                                    <span style={{ fontSize: '9px', color: darkMode ? '#64748B' : '#94A3B8' }}>+{item.hunger} hambre</span>
                                   </button>
                                 );
                               })}
@@ -4434,9 +5033,9 @@ export default function DashboardEscritorio({ onLogout }) {
                 <p style={{ fontSize: '13px', color: darkMode ? '#475569' : '#94A3B8', margin: 0 }}>© 2026 Safety Love • Tu bienestar emocional primero</p>
               </footer>
             </div>
-          </div>
-        )
-      }
+          </motion.div>
+        )}
+        </AnimatePresence>
       </main>
 
       <EmotionDayModal

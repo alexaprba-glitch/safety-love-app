@@ -10,7 +10,7 @@ import { getAssignedStudents } from './services/psychologist';
 function AppleEmoji({ emoji, className = "w-5 h-5 inline-block align-middle" }) {
   if (!emoji) return null;
   const codePoints = Array.from(emoji).map(c => c.codePointAt(0).toString(16));
-  return <img src={`https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/${codePoints.join('-')}.png`} alt={emoji} className={className} />;
+  return <img src={`https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/${codePoints.join('-')}.png`} alt={emoji} className={className} loading="lazy" decoding="async" />;
 }
 
 const FILTERS = ['Todos', 'En seguimiento', 'Requieren atención', 'Sin actividad reciente'];

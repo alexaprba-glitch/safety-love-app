@@ -1,13 +1,11 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RotateCcw, ChevronRight, ChevronLeft, Trophy, Star, ArrowLeft, Check, X, Lightbulb, FileText, Shield } from 'lucide-react';
+import { RotateCcw, ChevronRight, ChevronLeft, Trophy, ArrowLeft, Check, X, Lightbulb, FileText, Shield, Brain, Target, Star } from 'lucide-react';
+import { recordGameCompleted } from './gameStats';
 
-function saveGameStats(gameId, won) {
-  const stats = JSON.parse(localStorage.getItem('safetyLove_gameStats') || '{"played":0,"won":0,"stars":0}');
-  stats.played = (stats.played || 0) + 1;
-  if (won) stats.won = (stats.won || 0) + 1;
-  stats.stars = (stats.stars || 0) + (won ? 3 : 1);
-  localStorage.setItem('safetyLove_gameStats', JSON.stringify(stats));
+function saveGameStats(gameId, perfect) {
+  // Jugadas +1, Estrellas +2, Perfectas +1 solo si >9 correctas
+  recordGameCompleted(perfect);
 }
 
 const QUESTIONS = [
@@ -80,7 +78,7 @@ export default function QuizEmocional({ darkMode = false, onBack }) {
 
   const nextQuestion = () => {
     if (currentIndex + 1 >= totalQuestions) {
-      const won = score >= 8;
+      const won = score > 9;
       saveGameStats('quiz-emocional', won);
       setGameState('summary');
     } else {
@@ -98,20 +96,11 @@ export default function QuizEmocional({ darkMode = false, onBack }) {
     }
   };
 
-  const getEmoji = () => {
+  const getRecommendedCourse = () => {
     const pct = (score / totalQuestions) * 100;
-    if (pct >= 90) return '🏆';
-    if (pct >= 70) return '🌟';
-    if (pct >= 50) return '👍';
-    return '💪';
-  };
-
-  const getMessage = () => {
-    const pct = (score / totalQuestions) * 100;
-    if (pct >= 90) return '¡Increíble! Tienes un gran conocimiento sobre emociones y bienestar.';
-    if (pct >= 70) return '¡Muy bien! Entiendes bastante sobre inteligencia emocional.';
-    if (pct >= 50) return 'Buen intento. Sigue aprendiendo sobre emociones y salud mental.';
-    return 'Es un buen comienzo. Cada pregunta te ayuda a entender mejor tus emociones.';
+    if (pct >= 70) return 'INTELIGENCIA EMOCIONAL';
+    if (pct >= 50) return 'RESILIENCIA';
+    return 'AUTOCONOCIMIENTO';
   };
 
   if (gameState === 'menu') {
@@ -133,7 +122,7 @@ export default function QuizEmocional({ darkMode = false, onBack }) {
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', minHeight: 'calc(100vh - 80px)', padding: '40px 24px 60px' }}>
           <div style={{ width: '100%', maxWidth: '880px' }}>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginBottom: '32px' }}>
               <button
                 onClick={onBack}
                 style={{
@@ -147,10 +136,6 @@ export default function QuizEmocional({ darkMode = false, onBack }) {
               >
                 <ArrowLeft size={16} strokeWidth={2.2} /> Volver
               </button>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '999px', background: dm ? 'rgba(251,191,36,0.1)' : '#FFFBEB', border: `1px solid ${dm ? 'rgba(251,191,36,0.2)' : '#FDE68A'}` }}>
-                <Star size={15} style={{ color: '#F59E0B' }} fill="currentColor" />
-                <span style={{ fontSize: '14px', fontWeight: 700, color: dm ? '#FBBF24' : '#D97706' }}>0</span>
-              </div>
             </div>
 
             <div style={{
@@ -186,27 +171,30 @@ export default function QuizEmocional({ darkMode = false, onBack }) {
                 style={{
                   display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '0',
                   borderRadius: '18px', padding: '28px 32px', marginBottom: '32px',
-                  background: dm ? 'rgba(255,255,255,0.03)' : '#F8FAFC', border: `1px solid ${dm ? 'rgba(255,255,255,0.06)' : '#F1F5F9'}`, alignItems: 'center',
+                  background: dm ? 'rgba(255,255,255,0.06)' : '#FFFFFF',
+                  border: dm ? '1px solid rgba(255,255,255,0.1)' : '1px solid #E2E8F0',
+                  boxShadow: dm ? '0 8px 32px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.05)',
+                  alignItems: 'center',
                 }}
               >
                 <div style={{ textAlign: 'center', padding: '0 20px' }}>
-                  <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: dm ? 'rgba(255,255,255,0.06)' : '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 10px' }}>
-                    <FileText size={20} style={{ color: dm ? '#94A3B8' : '#64748B' }} />
+                  <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(34,197,94,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 10px' }}>
+                    <FileText size={22} style={{ color: '#22C55E' }} />
                   </div>
                   <p style={{ fontSize: '36px', fontWeight: 800, color: dm ? '#F8FAFC' : '#0F172A', lineHeight: 1, marginBottom: '4px' }}>{totalQuestions}</p>
-                  <p style={{ fontSize: '14px', fontWeight: 600, color: dm ? '#CBD5E1' : '#475569', marginBottom: '2px' }}>Preguntas</p>
-                  <p style={{ fontSize: '12px', color: dm ? '#64748B' : '#94A3B8' }}>Desafía tu intuición</p>
+                  <p style={{ fontSize: '14px', fontWeight: 600, color: dm ? '#E2E8F0' : '#475569', marginBottom: '2px' }}>Preguntas</p>
+                  <p style={{ fontSize: '12px', color: dm ? '#94A3B8' : '#94A3B8' }}>Desafía tu intuición</p>
                 </div>
 
-                <div className="quiz-info-divider" style={{ width: '1px', height: '72px', background: dm ? 'rgba(255,255,255,0.06)' : '#E2E8F0', margin: '0 8px' }} />
+                <div className="quiz-info-divider" style={{ width: '1px', height: '72px', background: dm ? 'rgba(255,255,255,0.1)' : '#E2E8F0', margin: '0 8px' }} />
 
                 <div style={{ textAlign: 'center', padding: '0 20px' }}>
-                  <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: dm ? 'rgba(255,255,255,0.06)' : '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 10px' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={dm ? '#94A3B8' : '#64748B'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(59,130,246,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 10px' }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                   </div>
                   <p style={{ fontSize: '20px', fontWeight: 700, color: dm ? '#F8FAFC' : '#0F172A', lineHeight: 1.2, marginBottom: '4px' }}>Sin tiempo límite</p>
-                  <p style={{ fontSize: '13px', color: dm ? '#CBD5E1' : '#475569', marginBottom: '2px' }}>Juega a tu ritmo</p>
-                  <p style={{ fontSize: '12px', color: dm ? '#64748B' : '#94A3B8' }}>Sin presión, sin apuros</p>
+                  <p style={{ fontSize: '13px', color: dm ? '#E2E8F0' : '#475569', marginBottom: '2px' }}>Juega a tu ritmo</p>
+                  <p style={{ fontSize: '12px', color: dm ? '#94A3B8' : '#94A3B8' }}>Sin presión, sin apuros</p>
                 </div>
               </div>
 
@@ -259,7 +247,7 @@ export default function QuizEmocional({ darkMode = false, onBack }) {
         <div style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 80px)', padding: '40px 24px 60px' }}>
           <div style={{ width: '100%', maxWidth: '780px' }}>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginBottom: '24px' }}>
               <button
                 onClick={onBack}
                 style={{
@@ -273,10 +261,6 @@ export default function QuizEmocional({ darkMode = false, onBack }) {
               >
                 <ArrowLeft size={16} strokeWidth={2.2} /> Volver
               </button>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '999px', background: dm ? 'rgba(251,191,36,0.1)' : '#FFFBEB', border: `1px solid ${dm ? 'rgba(251,191,36,0.2)' : '#FDE68A'}` }}>
-                <Star size={14} style={{ color: '#F59E0B' }} fill="currentColor" />
-                <span style={{ fontSize: '13px', fontWeight: 700, color: dm ? '#FBBF24' : '#D97706' }}>{score}</span>
-              </div>
             </div>
 
             <div style={{ marginBottom: '28px' }}>
@@ -360,20 +344,26 @@ export default function QuizEmocional({ darkMode = false, onBack }) {
                     const isSelected = idx === selectedAnswer;
                     const isAnswer = idx === q.answer;
 
-                    let bg = '#FFFFFF';
-                    let border = '#E2E8F0';
+                    let bg = dm ? 'rgba(255,255,255,0.03)' : '#FFFFFF';
+                    let border = dm ? 'rgba(255,255,255,0.08)' : '#E2E8F0';
                     let circleBg = 'transparent';
-                    let circleBorder = '#CBD5E1';
+                    let circleBorder = dm ? '#475569' : '#CBD5E1';
                     let icon = null;
 
                     if (isSelected && isAnswer) {
-                      bg = '#F0FDF4'; border = '#86EFAC'; circleBg = '#22C55E'; circleBorder = '#22C55E';
+                      bg = dm ? 'rgba(34,197,94,0.12)' : '#F0FDF4';
+                      border = dm ? 'rgba(34,197,94,0.4)' : '#86EFAC';
+                      circleBg = '#22C55E'; circleBorder = '#22C55E';
                       icon = <Check size={12} style={{ color: '#FFFFFF' }} />;
                     } else if (isSelected && !isAnswer) {
-                      bg = '#FEF2F2'; border = '#FCA5A5'; circleBg = '#EF4444'; circleBorder = '#EF4444';
+                      bg = dm ? 'rgba(239,68,68,0.12)' : '#FEF2F2';
+                      border = dm ? 'rgba(239,68,68,0.4)' : '#FCA5A5';
+                      circleBg = '#EF4444'; circleBorder = '#EF4444';
                       icon = <X size={12} style={{ color: '#FFFFFF' }} />;
                     } else if (isAnswer) {
-                      bg = '#F0FDF4'; border = '#86EFAC'; circleBg = '#22C55E'; circleBorder = '#22C55E';
+                      bg = dm ? 'rgba(34,197,94,0.12)' : '#F0FDF4';
+                      border = dm ? 'rgba(34,197,94,0.4)' : '#86EFAC';
+                      circleBg = '#22C55E'; circleBorder = '#22C55E';
                       icon = <Check size={12} style={{ color: '#FFFFFF' }} />;
                     }
 
@@ -455,6 +445,8 @@ export default function QuizEmocional({ darkMode = false, onBack }) {
 
   const isPerfect = score === totalQuestions;
   const showTrophyAnim = score >= 8;
+  const accuracy = Math.round((score / totalQuestions) * 100);
+  const recommendedCourse = getRecommendedCourse();
   return (
     <div style={{ minHeight: '100%', background: dm ? '#060B18' : '#F5F0E8', position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'absolute', top: '80px', left: '40px', width: '200px', height: '200px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(244,63,158,0.06), transparent 70%)', pointerEvents: 'none' }} />
@@ -494,53 +486,186 @@ export default function QuizEmocional({ darkMode = false, onBack }) {
           </button>
 
           <div style={{
-            background: dm ? '#111A2E' : '#FFFFFF', borderRadius: '24px', padding: '48px 52px', textAlign: 'center',
-            border: `1px solid ${dm ? 'rgba(255,255,255,0.06)' : '#F1F5F9'}`, boxShadow: dm ? '0 4px 24px rgba(0,0,0,0.2)' : '0 4px 24px rgba(0,0,0,0.04)',
+            background: dm ? '#111A2E' : '#FFFFFF', borderRadius: '24px', padding: '40px 44px', textAlign: 'center',
+            border: `1px solid ${dm ? 'rgba(255,255,255,0.06)' : '#E5E7EB'}`,
+            boxShadow: dm ? '0 4px 24px rgba(0,0,0,0.2)' : '0 12px 40px rgba(15,23,42,0.08)',
           }}>
-            <div style={{ fontSize: '64px', marginBottom: '16px' }}>{getEmoji()}</div>
-            <h2 style={{ fontSize: '28px', fontWeight: 900, color: dm ? '#F8FAFC' : '#0F172A', marginBottom: '12px', letterSpacing: '-0.02em' }}>¡Juego terminado!</h2>
+            <style>{`
+              @keyframes quiz-rev-confetti { 0%,100% { transform: translateY(0) rotate(0deg); opacity: 0.9; } 50% { transform: translateY(-7px) rotate(20deg); opacity: 1; } }
+              .quiz-rev-confetti { animation: quiz-rev-confetti 2.6s ease-in-out infinite; }
+              .quiz-rev-row { display: grid; grid-template-columns: 28px 1.5fr 1fr auto; align-items: center; }
+              @media (max-width: 640px) {
+                .quiz-rev-head { display: none !important; }
+                .quiz-rev-row { grid-template-columns: 24px 1fr auto; row-gap: 8px; }
+                .quiz-rev-user { grid-column: 2 / 4; }
+              }
+            `}</style>
 
-            <div style={{ borderRadius: '18px', padding: '28px', marginBottom: '32px', background: dm ? 'rgba(255,255,255,0.03)' : '#F8FAFC', border: `1px solid ${dm ? 'rgba(255,255,255,0.06)' : '#F1F5F9'}` }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', textAlign: 'center' }}>
-                <div>
-                  <p style={{ fontSize: '36px', fontWeight: 900, color: '#F43F9E', margin: 0 }}>{score}/{totalQuestions}</p>
-                  <p style={{ fontSize: '12px', fontWeight: 600, color: dm ? '#64748B' : '#94A3B8', marginTop: '4px' }}>Correctas</p>
+            {/* ── 1. TROFEO DORADO + CONFETI ── */}
+            <div className="relative mx-auto" style={{ width: '132px', height: '100px', marginBottom: '16px' }}>
+              {[
+                { l: '2%', t: '12%', s: '8px', c: '#F43F9E', d: '0s', r: '12px' },
+                { l: '10%', t: '62%', s: '6px', c: '#A78BFA', d: '0.4s', r: '50%' },
+                { l: '20%', t: '4%', s: '7px', c: '#FBBF24', d: '0.8s', r: '2px' },
+                { l: '78%', t: '6%', s: '8px', c: '#06B6D4', d: '0.2s', r: '50%' },
+                { l: '88%', t: '60%', s: '6px', c: '#22C55E', d: '1s', r: '2px' },
+                { l: '94%', t: '18%', s: '7px', c: '#A78BFA', d: '0.6s', r: '12px' },
+                { l: '32%', t: '0%', s: '6px', c: '#06B6D4', d: '1.2s', r: '50%' },
+                { l: '64%', t: '0%', s: '6px', c: '#FBBF24', d: '0.9s', r: '2px' },
+              ].map((p, i) => (
+                <span
+                  key={i}
+                  className="absolute quiz-rev-confetti"
+                  style={{ left: p.l, top: p.t, width: p.s, height: p.s, background: p.c, borderRadius: p.r, animationDelay: p.d }}
+                />
+              ))}
+              <motion.div
+                initial={{ scale: 0.6, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 17 }}
+                className="absolute flex items-center justify-center"
+                style={{
+                  left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
+                  width: '76px', height: '76px', borderRadius: '50%',
+                  background: dm ? 'linear-gradient(135deg, rgba(251,191,36,0.2), rgba(245,158,11,0.1))' : 'linear-gradient(135deg, #FFFBEB, #FEF3C7)',
+                  border: '2px solid rgba(251,191,36,0.4)',
+                  boxShadow: '0 12px 32px rgba(251,191,36,0.3)',
+                }}
+              >
+                <Trophy size={36} style={{ color: '#F59E0B' }} strokeWidth={2} fill="currentColor" fillOpacity={0.2} />
+              </motion.div>
+            </div>
+
+            <h2 className="font-black tracking-tight" style={{ fontSize: '32px', fontWeight: 900, color: '#EC4899', marginBottom: '8px' }}>
+              ¡COMPLETADO!
+            </h2>
+            <p style={{ fontSize: '14px', color: '#94A3B8', lineHeight: 1.6, marginBottom: '28px' }}>
+              Buen trabajo. Practicar más mejorará tu memoria.
+            </p>
+
+            {/* ── 2. TARJETAS DE MÉTRICAS ── */}
+            <div className="grid gap-3 mb-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
+              {/* Puntuación */}
+              <div className="rounded-[18px] p-5 text-center transition-all duration-200"
+                style={{ background: dm ? 'rgba(255,255,255,0.03)' : '#FDF4FF', border: '1.5px solid rgba(168,85,247,0.3)', boxShadow: '0 4px 16px rgba(168,85,247,0.08)' }}>
+                <p className="text-[10px] font-bold" style={{ color: '#94A3B8', letterSpacing: '0.07em', marginBottom: '10px' }}>SCORE DE CORRECTAS</p>
+                <div className="flex items-center justify-center" style={{ gap: '8px', marginBottom: '10px' }}>
+                  <span className="text-[26px] font-extrabold" style={{ color: '#A855F7' }}>{score}/{totalQuestions}</span>
+                  <span style={{ width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(168,85,247,0.12)', flexShrink: 0 }}>
+                    <Brain size={17} style={{ color: '#A855F7' }} />
+                  </span>
                 </div>
-                <div>
-                  <p style={{ fontSize: '36px', fontWeight: 900, color: '#22C55E', margin: 0 }}>{Math.round((score / totalQuestions) * 100)}%</p>
-                  <p style={{ fontSize: '12px', fontWeight: 600, color: dm ? '#64748B' : '#94A3B8', marginTop: '4px' }}>Precisión</p>
+                <p className="text-[10px] font-bold" style={{ color: '#94A3B8', letterSpacing: '0.07em' }}>PUNTUACIÓN OBTENIDA</p>
+              </div>
+              {/* Precisión */}
+              <div className="rounded-[18px] p-5 text-center transition-all duration-200"
+                style={{ background: dm ? 'rgba(255,255,255,0.03)' : '#F0FDF4', border: '1.5px solid rgba(34,197,94,0.3)', boxShadow: '0 4px 16px rgba(34,197,94,0.08)' }}>
+                <p className="text-[10px] font-bold" style={{ color: '#94A3B8', letterSpacing: '0.07em', marginBottom: '10px' }}>NIVEL DE PRECISIÓN</p>
+                <div className="flex items-center justify-center" style={{ gap: '8px', marginBottom: '10px' }}>
+                  <span className="text-[26px] font-extrabold" style={{ color: '#16A34A' }}>{accuracy}%</span>
+                  <span style={{ width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(34,197,94,0.12)', flexShrink: 0 }}>
+                    <Target size={17} style={{ color: '#16A34A' }} />
+                  </span>
                 </div>
+                <p className="text-[10px] font-bold" style={{ color: '#94A3B8', letterSpacing: '0.07em' }}>NIVEL DE ACIERTO</p>
+              </div>
+              {/* Recomendación */}
+              <div className="rounded-[18px] p-5 text-center transition-all duration-200"
+                style={{ background: dm ? 'rgba(255,255,255,0.03)' : '#EFF6FF', border: '1.5px solid rgba(59,130,246,0.3)', boxShadow: '0 4px 16px rgba(59,130,246,0.08)' }}>
+                <p className="flex items-center justify-center text-[10px] font-bold" style={{ color: '#94A3B8', letterSpacing: '0.07em', marginBottom: '10px', gap: '5px' }}>
+                  SIGUIENTE RETO <Star size={11} style={{ color: '#3B82F6' }} fill="currentColor" />
+                </p>
+                <div className="flex items-center justify-center" style={{ marginBottom: '10px' }}>
+                  <span style={{ width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(59,130,246,0.12)' }}>
+                    <Target size={20} style={{ color: '#3B82F6' }} />
+                  </span>
+                </div>
+                <p className="text-[10px] font-extrabold" style={{ color: '#1D4ED8', letterSpacing: '0.05em', lineHeight: 1.5 }}>
+                  CURSO RECOMENDADO:<br />{recommendedCourse}
+                </p>
               </div>
             </div>
 
-            <p style={{ fontSize: '14px', color: dm ? '#94A3B8' : '#64748B', marginBottom: '32px', lineHeight: 1.6 }}>{getMessage()}</p>
-
-            <div style={{ textAlign: 'left', marginBottom: '32px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {answers.map((a, i) => (
-                <div key={i} style={{
-                  display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 18px',
-                  borderRadius: '14px', fontSize: '13px', background: a.correct ? (dm ? 'rgba(34,197,94,0.08)' : '#F0FDF4') : (dm ? 'rgba(239,68,68,0.08)' : '#FEF2F2'),
-                }}>
-                  <span style={{ fontSize: '16px' }}>{a.correct ? '✅' : '❌'}</span>
-                  <span style={{ fontWeight: 500, color: dm ? '#E2E8F0' : '#1E293B' }}>{a.q.slice(0, 50)}...</span>
-                </div>
-              ))}
+            {/* ── 3. TABLA DE PREGUNTAS Y CORRECCIONES ── */}
+            <div className="rounded-[18px] text-left mb-6"
+              style={{
+                background: dm ? 'rgba(255,255,255,0.02)' : '#F8FAFC',
+                border: `1px solid ${dm ? 'rgba(255,255,255,0.08)' : '#E5E7EB'}`,
+              }}>
+              <div className="quiz-rev-head quiz-rev-row text-[10px] font-bold"
+                style={{ padding: '14px 16px 10px', color: '#94A3B8', letterSpacing: '0.07em', gap: '12px' }}>
+                <span />
+                <span>PREGUNTA</span>
+                <span>TU RESPUESTA</span>
+                <span className="text-center" style={{ minWidth: '86px' }}>CORRECCIÓN</span>
+              </div>
+              <div className="overflow-y-auto px-2 pb-2" style={{ maxHeight: '240px' }}>
+                {answers.map((a, i) => {
+                  const ok = a.correct;
+                  return (
+                    <div
+                      key={i}
+                      className="quiz-rev-row"
+                      style={{
+                        gap: '12px',
+                        padding: '12px 14px',
+                        borderRadius: '12px',
+                        marginBottom: i === answers.length - 1 ? 0 : '6px',
+                        background: ok
+                          ? (dm ? 'rgba(34,197,94,0.07)' : '#ECFDF5')
+                          : (dm ? 'rgba(244,63,94,0.07)' : '#FFF1F2'),
+                        borderBottom: `1px solid ${ok ? 'rgba(34,197,94,0.15)' : 'rgba(244,63,94,0.15)'}`,
+                      }}
+                    >
+                      <span className="flex items-center justify-center shrink-0"
+                        style={{ width: '24px', height: '24px', borderRadius: '50%', background: ok ? '#16A34A' : '#F43F5E' }}>
+                        {ok
+                          ? <Check size={13} style={{ color: '#fff' }} strokeWidth={3.5} />
+                          : <X size={13} style={{ color: '#fff' }} strokeWidth={3.5} />}
+                      </span>
+                      <span className="text-[12.5px] font-medium leading-snug" style={{ color: dm ? '#E2E8F0' : '#1E293B' }}>
+                        {a.q}
+                      </span>
+                      <span className="quiz-rev-user text-[12px] leading-snug" style={{ color: dm ? '#94A3B8' : '#64748B' }}>
+                        {a.options[a.userAnswer]}
+                      </span>
+                      <span className="flex items-center justify-center" style={{ minWidth: '86px' }}>
+                        <span className="flex items-center" style={{ gap: '6px' }}>
+                          <span style={{ width: '18px', height: '18px', borderRadius: '50%', background: ok ? '#16A34A' : '#F43F5E', flexShrink: 0 }} />
+                          {!ok && (
+                            <span className="text-[10.5px] font-semibold hidden md:inline" style={{ color: '#64748B', maxWidth: '120px' }} title={a.options[a.answer]}>
+                              {a.options[a.answer].length > 28 ? a.options[a.answer].slice(0, 28) + '…' : a.options[a.answer]}
+                            </span>
+                          )}
+                        </span>
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
+            {/* CTA */}
             <button
               onClick={startGame}
+              className="w-full rounded-full transition-all duration-200"
               style={{
-                width: '100%', height: '56px', borderRadius: '16px',
+                height: '56px', borderRadius: '999px',
                 background: 'linear-gradient(135deg, #F43F9E, #E83D8A)', color: '#FFFFFF',
                 fontSize: '16px', fontWeight: 700, border: 'none', cursor: 'pointer',
                 boxShadow: '0 4px 16px rgba(244,63,158,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
-                transition: 'all 0.2s',
+                marginBottom: '18px',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 6px 24px rgba(244,63,158,0.4)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(244,63,158,0.3)'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 6px 24px rgba(244,63,158,0.4)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(244,63,158,0.3)'; e.currentTarget.style.transform = 'translateY(0)'; }}
             >
               <RotateCcw size={18} /> Jugar de nuevo
             </button>
+
+            {/* ── 4. FOOTER ── */}
+            <p className="text-center" style={{ fontSize: '12.5px', color: '#94A3B8', lineHeight: 1.6 }}>
+              Buen intento. Sigue aprendiendo sobre emociones y salud mental.
+            </p>
           </div>
         </div>
       </div>

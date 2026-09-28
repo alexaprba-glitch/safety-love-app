@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { addEmergencyRequest } from './emergencyStore';
 import {
-  Heart, ChevronRight, Plus, Lock, BookOpen, Edit3, Image as ImageIcon, Tag,
+  Heart, ChevronRight, Plus, BookOpen, Edit3, Image as ImageIcon,
   Pencil, Trash2, X, Shield, ArrowRight
 } from 'lucide-react';
 
@@ -17,7 +17,9 @@ function DiaryPersonalSection({ darkMode, onToast, userName }) {
   const [editingText, setEditingText] = useState('');
   const [showEditCard, setShowEditCard] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
   const recentCardRef = useRef(null);
+  const imageInputRef = useRef(null);
 
   const formatDiaryDate = (d) => {
     const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
@@ -26,16 +28,18 @@ function DiaryPersonalSection({ darkMode, onToast, userName }) {
 
   const saveEntry = () => {
     const text = editorContent.trim();
-    if (!text) return;
+    if (!text && !imagePreview) return;
     const newEntry = {
       icon: <Edit3 size={20} strokeWidth={2} />,
       color: 'text-pink-500',
       bg: 'bg-pink-100',
       date: formatDiaryDate(new Date()),
       text,
+      image: imagePreview,
     };
     setSavedEntries(prev => [newEntry, ...prev]);
     setEditorContent('');
+    setImagePreview(null);
     setJustSaved(true);
     setTimeout(() => setJustSaved(false), 3200);
     setTimeout(() => { recentCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 120);
@@ -62,6 +66,15 @@ function DiaryPersonalSection({ darkMode, onToast, userName }) {
     setSavedEntries(prev => prev.filter((_, i) => i !== index));
     if (editingIndex === index) { setShowEditCard(false); setEditingIndex(null); }
     onToast('Anécdota eliminada');
+  };
+
+  const handleImageSelect = (file) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
   };
 
   const bg = dm ? '#070D1C' : '#F5F0E8';
@@ -238,6 +251,21 @@ function DiaryPersonalSection({ darkMode, onToast, userName }) {
                 </div>
               </div>
 
+              {imagePreview && (
+                <div style={{ padding: '0 28px', marginBottom: '12px' }}>
+                  <div style={{ position: 'relative', display: 'inline-block' }}>
+                    <img src={imagePreview} alt="Vista previa" style={{ maxWidth: '200px', maxHeight: '120px', borderRadius: '12px', objectFit: 'cover', border: `1px solid ${cardBorder}` }} loading="lazy" decoding="async" />
+                    <button onClick={() => setImagePreview(null)} style={{
+                      position: 'absolute', top: '-6px', right: '-6px',
+                      width: '22px', height: '22px', borderRadius: '50%',
+                      background: '#EC4899', color: '#fff',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      border: 'none', cursor: 'pointer', fontSize: '11px', fontWeight: 700
+                    }}>✕</button>
+                  </div>
+                </div>
+              )}
+
               {/* Toolbar + Save */}
               <div style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -245,29 +273,24 @@ function DiaryPersonalSection({ darkMode, onToast, userName }) {
                 gap: '16px', flexWrap: 'wrap'
               }}>
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                  {[
-                    { icon: <ImageIcon size={15} strokeWidth={2} />, label: 'Imagen' },
-                    { icon: <Tag size={15} strokeWidth={2} />, label: 'Etiqueta' },
-                    { icon: <Lock size={15} strokeWidth={2} />, label: 'Privado' },
-                  ].map(btn => (
-                    <button key={btn.label} style={{
-                      height: '38px', padding: '0 16px', borderRadius: '12px',
-                      border: `1px solid ${cardBorder}`, cursor: 'pointer',
-                      background: dm ? 'rgba(255,255,255,0.03)' : '#F8FAFC',
-                      color: dm ? '#94A3B8' : '#64748B',
-                      fontSize: '13px', fontWeight: 600,
-                      display: 'flex', alignItems: 'center', gap: '7px',
-                      transition: 'all 150ms ease', fontFamily: 'inherit'
-                    }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = hoverBg; e.currentTarget.style.color = textPrimary; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = dm ? 'rgba(255,255,255,0.03)' : '#F8FAFC'; e.currentTarget.style.color = dm ? '#94A3B8' : '#64748B'; }}
-                    >
-                      {btn.icon} {btn.label}
-                    </button>
-                  ))}
+                  <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleImageSelect(e.target.files[0])} />
+                  <button onClick={() => imageInputRef.current?.click()} style={{
+                    height: '38px', padding: '0 16px', borderRadius: '12px',
+                    border: `1px solid ${cardBorder}`, cursor: 'pointer',
+                    background: imagePreview ? (dm ? 'rgba(236,72,153,0.12)' : '#FFF0F6') : (dm ? 'rgba(255,255,255,0.03)' : '#F8FAFC'),
+                    color: imagePreview ? '#EC4899' : (dm ? '#94A3B8' : '#64748B'),
+                    fontSize: '13px', fontWeight: 600,
+                    display: 'flex', alignItems: 'center', gap: '7px',
+                    transition: 'all 150ms ease', fontFamily: 'inherit'
+                  }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = dm ? 'rgba(236,72,153,0.12)' : '#FFF0F6'; e.currentTarget.style.color = '#EC4899'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = imagePreview ? (dm ? 'rgba(236,72,153,0.12)' : '#FFF0F6') : (dm ? 'rgba(255,255,255,0.03)' : '#F8FAFC'); e.currentTarget.style.color = imagePreview ? '#EC4899' : (dm ? '#94A3B8' : '#64748B'); }}
+                  >
+                    <ImageIcon size={15} strokeWidth={2} /> {imagePreview ? 'Cambiar imagen' : 'Imagen'}
+                  </button>
                 </div>
                 <div>
-                  {editorContent.trim()
+                  {(editorContent.trim() || imagePreview)
                     ? <button onClick={saveEntry} style={{
                         height: '42px', padding: '0 22px', borderRadius: '14px',
                         border: 'none', cursor: 'pointer',
@@ -422,6 +445,9 @@ function DiaryPersonalSection({ darkMode, onToast, userName }) {
                             fontSize: '14px', fontWeight: 600, color: textPrimary,
                             margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
                           }}>{entry.text}</p>
+                          {entry.image && (
+                            <img src={entry.image} alt="Imagen de anécdota" onClick={() => setLightboxImg(entry.image)} style={{ marginTop: '8px', maxWidth: '120px', maxHeight: '80px', borderRadius: '10px', objectFit: 'cover', cursor: 'pointer', border: `1px solid ${cardBorder}` }} loading="lazy" decoding="async" />
+                          )}
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '4px', opacity: 0, transition: 'opacity 200ms ease' }}
                           className="entry-actions"
@@ -566,7 +592,7 @@ function DiaryPersonalSection({ darkMode, onToast, userName }) {
             border: 'none', cursor: 'pointer', fontSize: '20px',
             display: 'flex', alignItems: 'center', justifyContent: 'center'
           }}>×</button>
-          <img src={lightboxImg} alt="Imagen completa" style={{ maxWidth: '100%', maxHeight: '100%', borderRadius: '16px', objectFit: 'contain', boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }} onClick={(e) => e.stopPropagation()} />
+          <img src={lightboxImg} alt="Imagen completa" style={{ maxWidth: '100%', maxHeight: '100%', borderRadius: '16px', objectFit: 'contain', boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }} onClick={(e) => e.stopPropagation()} loading="lazy" decoding="async" />
         </div>, document.body
       )}
 
@@ -585,10 +611,10 @@ function DiaryPersonalSection({ darkMode, onToast, userName }) {
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <div style={{ position: 'relative', width: '120px', height: '120px', marginBottom: '24px' }}>
                   <div style={{ position: 'absolute', inset: 0, animation: 'ping 1s cubic-bezier(0,0,0.2,1) infinite', opacity: 0.3 }}>
-                    <img src="/logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    <img src="/logo.webp" loading="lazy" width="48" height="48" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                   </div>
                   <div style={{ position: 'absolute', inset: 0, animation: 'bounce 1s infinite' }}>
-                    <img src="/logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    <img src="/logo.webp" loading="lazy" width="48" height="48" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>

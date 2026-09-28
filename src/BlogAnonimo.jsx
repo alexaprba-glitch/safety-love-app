@@ -7,8 +7,9 @@ import {
 } from 'lucide-react';
 import { getUser } from './services/auth';
 import { getPosts, createPost, addComment } from './services/posts';
+import { toastError, toastSuccess } from './Toast';
 
-export default function BlogAnonimo({ darkMode = false }) {
+export default function BlogAnonimo({ darkMode = false, userPhotoUrl = null }) {
   const dm = darkMode;
   const [postText, setPostText] = useState('');
   const [category, setCategory] = useState('Relaciones');
@@ -58,7 +59,7 @@ export default function BlogAnonimo({ darkMode = false }) {
           user_id: p.user_id,
         }));
         setPosts(formatted);
-      } catch {}
+      } catch { toastError('Error al cargar las publicaciones.'); }
     })();
     return () => { cancelled = true; };
   }, []);
@@ -110,7 +111,7 @@ export default function BlogAnonimo({ darkMode = false }) {
     if (userId && selectedPost.id) {
       try {
         await addComment({ postId: selectedPost.id, userId, authorName: 'Tú', content: cleanText || 'Imagen' });
-      } catch {}
+      } catch { toastError('Error al agregar el comentario.'); }
     }
   };
 
@@ -206,7 +207,8 @@ export default function BlogAnonimo({ darkMode = false }) {
           avatarColor: !isAnonymous ? colorCls : null,
         });
         setPosts(prev => prev.map(p => p.id === tempId ? { ...p, id: saved.id } : p));
-      } catch {}
+        toastSuccess('Publicación creada con éxito');
+      } catch { toastError('Error al crear la publicación.'); }
     }
   };
 
@@ -231,7 +233,7 @@ export default function BlogAnonimo({ darkMode = false }) {
     if (avatarImage) {
       return (
         <div className={`${sizeClasses} rounded-full overflow-hidden flex-shrink-0`}>
-          <img src={avatarImage} alt={post.author || 'Usuario'} className="w-full h-full object-cover" />
+          <img src={avatarImage} alt={post.author || 'Usuario'} className="w-full h-full object-cover" loading="lazy" decoding="async" />
         </div>
       );
     }
@@ -249,9 +251,9 @@ export default function BlogAnonimo({ darkMode = false }) {
 
   return (
     <div className="h-full overflow-y-auto custom-scrollbar" style={{ background: dm ? '#070D1C' : '#F5F0E8' }}>
-      <div className="px-6 sm:px-10 lg:px-16 py-10 lg:py-12">
+      <div className="px-6 sm:px-10 lg:px-20 py-10 lg:py-12">
         <div className="w-full mx-auto" style={{ maxWidth: '1300px', padding: '0 16px' }}>
-          <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_340px]" style={{ gap: '24px' }}>
+          <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_400px]" style={{ gap: '24px' }}>
 
             {/* ═══════════════ MAIN FEED ═══════════════ */}
             <main className="min-w-0 flex flex-col" style={{ gap: '24px' }}>
@@ -267,14 +269,20 @@ export default function BlogAnonimo({ darkMode = false }) {
                 }}
               >
                 <div className="flex items-start" style={{ gap: '20px' }}>
-                  <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
-                    style={{ background: dm ? 'rgba(248,59,145,0.12)' : '#FFF0F6' }}
-                  >
-                    <svg className="w-6 h-6" style={{ color: pink }} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 12a4 4 0 100-8 4 4 0 000 8zM6 20a6 6 0 0112 0" />
-                    </svg>
-                  </div>
+                  {!isAnonymous && userPhotoUrl ? (
+                    <div className="w-14 h-14 rounded-2xl overflow-hidden shrink-0">
+                      <img src={userPhotoUrl} alt="Tu avatar" className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div
+                      className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
+                      style={{ background: dm ? 'rgba(248,59,145,0.12)' : '#FFF0F6' }}
+                    >
+                      <svg className="w-6 h-6" style={{ color: pink }} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 12a4 4 0 100-8 4 4 0 000 8zM6 20a6 6 0 0112 0" />
+                      </svg>
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <h2
                       className="font-poppins font-extrabold leading-tight"
@@ -283,7 +291,7 @@ export default function BlogAnonimo({ darkMode = false }) {
                       ¿Qué hay en tu corazón hoy?
                     </h2>
                     <p className="mt-1.5" style={{ fontSize: '16px', color: dm ? '#64748B' : '#7C8AA5' }}>
-                      Compártelo anónimamente…
+                      {isAnonymous ? 'Compártelo anónimamente…' : 'Compártelo con todos…'}
                     </p>
                   </div>
                 </div>
@@ -308,7 +316,7 @@ export default function BlogAnonimo({ darkMode = false }) {
 
                 {imagePreviewUrl && (
                   <div className="mt-4 relative inline-block">
-                    <img src={imagePreviewUrl} alt="preview" className="w-20 h-14 object-cover rounded-xl" style={{ border: `1px solid ${dm ? 'rgba(255,255,255,0.08)' : '#E8ECF2'}` }} />
+                    <img src={imagePreviewUrl} alt="preview" className="w-20 h-14 object-cover rounded-xl" style={{ border: `1px solid ${dm ? 'rgba(255,255,255,0.08)' : '#E8ECF2'}` }} loading="lazy" decoding="async" />
                     <button onClick={() => setImagePreviewUrl(null)} className="absolute -top-2 -right-2 h-6 w-6 flex items-center justify-center rounded-full bg-[#1E293B] text-white text-[11px] hover:bg-[#334155] transition">✕</button>
                   </div>
                 )}
@@ -545,7 +553,7 @@ export default function BlogAnonimo({ darkMode = false }) {
 
                       {/* Image */}
                       {post.image_url && (
-                        <img src={post.image_url} alt="Imagen" className="mt-4 w-full max-h-56 rounded-[16px] object-cover cursor-pointer hover:opacity-90 transition" />
+                        <img src={post.image_url} alt="Imagen" className="mt-4 w-full max-h-56 rounded-[16px] object-cover cursor-pointer hover:opacity-90 transition" loading="lazy" decoding="async" />
                       )}
 
                       {/* Metrics */}
@@ -749,7 +757,7 @@ export default function BlogAnonimo({ darkMode = false }) {
             <div className="flex-1 overflow-y-auto px-6 py-5">
               <p className="text-[14px] leading-[1.65]" style={{ color: dm ? '#CBD5E1' : '#64748B' }}>{selectedPost.body}</p>
               {selectedPost.image_url && (
-                <img src={selectedPost.image_url} alt="" className="mt-4 w-full max-h-52 rounded-[16px] object-cover" />
+                <img src={selectedPost.image_url} alt="" className="mt-4 w-full max-h-52 rounded-[16px] object-cover" loading="lazy" decoding="async" />
               )}
               {selectedPost.tags && selectedPost.tags.length > 0 && (
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -787,7 +795,7 @@ export default function BlogAnonimo({ darkMode = false }) {
                             )}
                           </div>
                           {comment.text && <p className="mt-1 text-[14px] leading-[1.55]" style={{ color: dm ? '#CBD5E1' : '#64748B' }}>{comment.text}</p>}
-                          {comment.image && <img src={comment.image} alt="" className="mt-2 max-h-28 rounded-xl object-cover" />}
+                          {comment.image && <img src={comment.image} alt="" className="mt-2 max-h-28 rounded-xl object-cover" loading="lazy" decoding="async" />}
                           <div className="mt-2 flex items-center gap-3">
                             <button onClick={() => toggleCommentLike(comment.id)}
                               className="inline-flex items-center gap-1 text-[11px] font-medium transition-all duration-150"
@@ -843,7 +851,7 @@ export default function BlogAnonimo({ darkMode = false }) {
               </div>
               {commentDraft.imageUrl && (
                 <div className="relative mt-3 inline-block">
-                  <img src={commentDraft.imageUrl} alt="" className="max-h-20 rounded-xl object-cover" />
+                  <img src={commentDraft.imageUrl} alt="" className="max-h-20 rounded-xl object-cover" loading="lazy" decoding="async" />
                   <button onClick={() => setCommentDraft(prev => ({ ...prev, imageUrl: null }))} className="absolute -top-2 -right-2 h-6 w-6 flex items-center justify-center rounded-full text-white text-[10px]"
                     style={{ background: dm ? '#1E293B' : '#1E293B' }}>✕</button>
                 </div>

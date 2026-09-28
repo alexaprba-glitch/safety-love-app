@@ -108,13 +108,13 @@ export default function LandingPage({ onEnterApp }) {
         WebkitBackdropFilter: scrolled ? 'blur(20px) saturate(1.8)' : 'none',
         borderBottom: scrolled ? (darkMode ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.04)') : '1px solid transparent',
       }}>
-        <nav className="max-w-[1320px] mx-auto flex items-center h-[76px]" style={{ padding: '0 40px' }}>
+        <nav className="max-w-[1320px] mx-auto flex items-center h-[76px] px-4 sm:px-6 lg:px-10">
           {/* LEFT — Logo */}
           <a href="#" className="flex items-center gap-3 shrink-0" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
-            <img src="/logo.png" alt="SafetyLove" className="w-28 h-28 object-contain" />
+            <img src="/logo.webp" loading="lazy" width="48" height="48" alt="SafetyLove" className="w-16 h-16 sm:w-20 sm:h-20 lg:w-28 lg:h-28 object-contain" />
             <div className="flex flex-col">
-              <span className="font-bold text-[26px] tracking-tight leading-tight" style={{ color: darkMode ? '#F8FAFC' : '#0F172A' }}>Safety Love</span>
-              <span className="text-[14px] font-medium leading-tight" style={{ color: '#94A3B8' }}>Tu bienestar emocional importa</span>
+              <span className="font-bold text-lg sm:text-xl lg:text-[26px] tracking-tight leading-tight" style={{ color: darkMode ? '#F8FAFC' : '#0F172A' }}>Safety Love</span>
+              <span className="text-[11px] sm:text-[13px] lg:text-[14px] font-medium leading-tight" style={{ color: '#94A3B8' }}>Tu bienestar emocional importa</span>
             </div>
           </a>
 
@@ -293,268 +293,181 @@ export default function LandingPage({ onEnterApp }) {
           <div style={{ position: 'absolute', top: '28%', right: '16%', width: '6px', height: '6px', borderRadius: '50%', opacity: darkMode ? 0.12 : 0.20, pointerEvents: 'none', background: '#FF3F83' }} />
           <div style={{ position: 'absolute', bottom: '20%', left: '12%', width: '6px', height: '6px', borderRadius: '50%', opacity: darkMode ? 0.12 : 0.20, pointerEvents: 'none', background: '#A78BFA' }} />
 
-          <div style={{ margin: '0 auto', width: '100%', maxWidth: '1400px', paddingLeft: '64px', paddingRight: '64px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '0.45fr 0.55fr', gap: '64px', alignItems: 'center', minHeight: '520px' }}>
+          <div className="w-full max-w-[1400px] mx-auto px-5 sm:px-10 lg:px-16" style={{ position: 'relative', display: 'flex', alignItems: 'center', minHeight: '520px', gap: '48px' }}>
+            {/* Text Content - Left side */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', textAlign: 'center', alignItems: 'center' }}>
+              {/* Title */}
+              <FadeIn delay={80}>
+                <h1 style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 900, fontSize: 'clamp(42px, 5vw, 72px)', lineHeight: 1.0, letterSpacing: '-0.03em', color: darkMode ? '#F8FAFC' : '#0F172A', marginBottom: '30px', maxWidth: '600px' }}>
+                  Un espacio<br />seguro<br />
+                  <span style={{ color: '#FF3F83' }}>para ser tú.</span>
+                </h1>
+              </FadeIn>
 
-              {/* ─── Left Column ─── */}
-              <div style={{ textAlign: 'left' }}>
-                {/* Title */}
-                <FadeIn delay={80}>
-                  <h1 style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 900, fontSize: 'clamp(42px, 5vw, 72px)', lineHeight: 1.0, letterSpacing: '-0.03em', color: darkMode ? '#F8FAFC' : '#0F172A', marginBottom: '30px', maxWidth: '540px' }}>
-                    Un espacio<br />seguro<br />
-                    <span style={{ color: '#FF3F83' }}>para ser tú.</span>
-                  </h1>
-                </FadeIn>
+              {/* Description */}
+              <FadeIn delay={160}>
+                <p style={{ color: darkMode ? '#94A3B8' : '#64748B', fontSize: '18px', lineHeight: 1.65, maxWidth: '540px', marginBottom: '32px' }}>
+                  Safety Love es tu compañera en el camino hacia una mejor versión de ti. Aquí podrás expresar lo que sientes, recibir apoyo emocional, organizar tu vida y construir relaciones más sanas.
+                </p>
+              </FadeIn>
 
-                {/* Description */}
-                <FadeIn delay={160}>
-                  <p style={{ color: darkMode ? '#94A3B8' : '#64748B', fontSize: '18px', lineHeight: 1.65, maxWidth: '540px', marginBottom: '32px' }}>
-                    Safety Love es tu compañera en el camino hacia una mejor versión de ti. Aquí podrás expresar lo que sientes, recibir apoyo emocional, organizar tu vida y construir relaciones más sanas.
-                  </p>
-                </FadeIn>
+              {/* Buttons */}
+              <FadeIn delay={240}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                  <button onClick={() => onEnterApp?.()} style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '10px',
+                    fontWeight: 600, color: 'white', fontSize: '16px',
+                    background: 'linear-gradient(135deg, #FF3F83 0%, #FF6FA3 100%)',
+                    height: '58px', paddingLeft: '12px', paddingRight: '32px',
+                    borderRadius: '999px', border: 'none', cursor: 'pointer',
+                    boxShadow: '0 4px 24px rgba(255,63,131,0.30), 0 1px 3px rgba(255,63,131,0.15)',
+                    transition: 'all 0.22s cubic-bezier(0.4,0,0.2,1)',
+                  }}
+                    onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(255,63,131,0.40), 0 2px 6px rgba(255,63,131,0.18)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(255,63,131,0.30), 0 1px 3px rgba(255,63,131,0.15)'; }}
+                    onMouseDown={(e) => { e.currentTarget.style.transform = 'translateY(1px)'; }}
+                    onMouseUp={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                  >
+                    <span style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'rgba(255,255,255,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Heart size={15} color="white" fill="white" />
+                    </span>
+                    Comenzar ahora
+                    <ArrowRight size={17} />
+                  </button>
+                </div>
+              </FadeIn>
 
-                {/* Buttons */}
-                <FadeIn delay={240}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px', flexWrap: 'wrap' }}>
-                    {/* Primary — Comenzar ahora */}
-                    <button onClick={() => onEnterApp?.()} style={{
-                      display: 'inline-flex', alignItems: 'center', gap: '10px',
-                      fontWeight: 600, color: 'white', fontSize: '16px',
-                      background: 'linear-gradient(135deg, #FF3F83 0%, #FF6FA3 100%)',
-                      height: '58px', paddingLeft: '12px', paddingRight: '32px',
-                      borderRadius: '999px', border: 'none', cursor: 'pointer',
-                      boxShadow: '0 4px 24px rgba(255,63,131,0.30), 0 1px 3px rgba(255,63,131,0.15)',
-                      transition: 'all 0.22s cubic-bezier(0.4,0,0.2,1)',
-                    }}
-                      onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(255,63,131,0.40), 0 2px 6px rgba(255,63,131,0.18)'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(255,63,131,0.30), 0 1px 3px rgba(255,63,131,0.15)'; }}
-                      onMouseDown={(e) => { e.currentTarget.style.transform = 'translateY(1px)'; }}
-                      onMouseUp={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                    >
-                      <span style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'rgba(255,255,255,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <Heart size={15} color="white" fill="white" />
-                      </span>
-                      Comenzar ahora
-                      <ArrowRight size={17} />
-                    </button>
+              {/* Social Proof */}
+              <FadeIn delay={320}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'center' }}>
+                  <div style={{ display: 'flex', gap: '-8px' }}>
+                    {['#FF3F83','#A78BFA','#38BDF8','#34D399','#F59E0B'].map((c,i) => (
+                      <div key={i} style={{ width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, background: c, border: darkMode ? '2px solid #060B18' : '2px solid white', zIndex: 5-i, fontSize: '10px', marginLeft: i > 0 ? '-8px' : 0 }}>
+                        {['M','L','A','S','V'][i]}
+                      </div>
+                    ))}
                   </div>
-                </FadeIn>
-
-                {/* Social Proof */}
-                <FadeIn delay={320}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ display: 'flex', gap: '-8px' }}>
-                      {['#FF3F83','#A78BFA','#38BDF8','#34D399','#F59E0B'].map((c,i) => (
-                        <div key={i} style={{ width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, background: c, border: darkMode ? '2px solid #060B18' : '2px solid white', zIndex: 5-i, fontSize: '10px', marginLeft: i > 0 ? '-8px' : 0 }}>
-                          {['M','L','A','S','V'][i]}
-                        </div>
-                      ))}
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ fontWeight: 700, color: '#FF3F83', fontSize: '13px' }}>+9K</span>
-                      <span style={{ fontWeight: 500, color: '#94A3B8', fontSize: '13px' }}>Más de <strong style={{ color: darkMode ? '#CBD5E1' : '#475569' }}>10,000 personas</strong><br />ya confían en Safety Love</span>
-                    </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontWeight: 700, color: '#FF3F83', fontSize: '13px' }}>+9K</span>
+                    <span style={{ fontWeight: 500, color: '#94A3B8', fontSize: '13px' }}>Más de <strong style={{ color: darkMode ? '#CBD5E1' : '#475569' }}>10,000 personas</strong><br />ya confían en Safety Love</span>
                   </div>
-                </FadeIn>
-              </div>
+                </div>
+              </FadeIn>
+            </div>
 
-              {/* ─── Right Column — Phone Mockup + Floating Cards ─── */}
-              <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                <FadeIn delay={200}>
-                  <div style={{ position: 'relative', width: '100%', maxWidth: '560px', height: '720px' }}>
-
-                    {/* ─── Phone Frame ─── */}
-                    <div style={{
-                      position: 'absolute',
-                      left: '50%',
-                      top: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      width: '320px',
-                      height: '650px',
-                      background: '#1A1A2E',
-                      borderRadius: '48px',
-                      boxShadow: '0 40px 120px rgba(15,23,42,0.25), 0 0 0 1px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.08)',
-                      zIndex: 10,
-                      overflow: 'hidden',
-                    }}>
-                      {/* Side buttons */}
-                      <div style={{ position: 'absolute', left: '-2px', top: '140px', width: '3px', height: '40px', background: '#2A2A3E', borderRadius: '2px 0 0 2px' }} />
-                      <div style={{ position: 'absolute', left: '-2px', top: '200px', width: '3px', height: '70px', background: '#2A2A3E', borderRadius: '2px 0 0 2px' }} />
-
-                      {/* Screen */}
-                      <div style={{
-                        position: 'absolute',
-                        inset: '8px',
-                        borderRadius: '40px',
-                        overflow: 'hidden',
-                        background: darkMode ? '#111A2E' : '#F5F0E8',
-                      }}>
-                        {/* Status bar */}
-                        <div style={{
-                          height: '48px',
-                          background: darkMode ? 'linear-gradient(180deg, #1A1A2E 0%, #111A2E 100%)' : 'linear-gradient(180deg, #F5F0E8 0%, #F5F0E8 100%)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          position: 'relative',
-                        }}>
-                          {/* Notch */}
-                          <div style={{
-                            position: 'absolute',
-                            top: '0',
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                            width: '100px',
-                            height: '28px',
-                            background: '#1A1A2E',
-                            borderRadius: '0 0 20px 20px',
-                          }}>
-                            {/* Camera */}
-                            <div style={{
-                              position: 'absolute',
-                              top: '8px',
-                              right: '18px',
-                              width: '10px',
-                              height: '10px',
-                              borderRadius: '50%',
-                              background: '#2A2A3E',
-                              border: '2px solid #1A1A2E',
-                            }} />
+            {/* Phone Mockup - Right side */}
+            <FadeIn delay={200}>
+              <div style={{ position: 'relative', flexShrink: 0 }}>
+                {/* Pink halo glow */}
+                <div style={{
+                  position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
+                  width: '380px', height: '380px', borderRadius: '50%',
+                  background: 'radial-gradient(circle, rgba(255,63,131,0.08) 0%, transparent 70%)',
+                  pointerEvents: 'none',
+                }} />
+                {/* Phone Frame */}
+                <div style={{
+                  width: '320px', height: '650px', background: '#1A1A2E',
+                  borderRadius: '48px', position: 'relative', overflow: 'hidden',
+                  boxShadow: '0 40px 120px rgba(15,23,42,0.25), 0 0 0 1px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.08)',
+                }}>
+                  {/* Screen */}
+                  <div style={{ position: 'absolute', inset: '8px', borderRadius: '40px', overflow: 'hidden', background: darkMode ? '#111A2E' : '#F5F0E8' }}>
+                    {/* Status bar */}
+                    <div style={{ height: '48px', background: darkMode ? 'linear-gradient(180deg, #1A1A2E 0%, #111A2E 100%)' : 'linear-gradient(180deg, #F5F0E8 0%, #F5F0E8 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                      <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '100px', height: '28px', background: '#1A1A2E', borderRadius: '0 0 20px 20px' }} />
+                    </div>
+                    {/* App Content — Blog Anónimo Mobile */}
+                    <div style={{ height: 'calc(100% - 48px)', overflow: 'hidden', background: darkMode ? '#0A1020' : '#F5F0E8' }}>
+                      {/* Blog Header */}
+                      <div style={{ padding: '14px 18px 10px', background: darkMode ? '#0A1020' : '#F5F0E8' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#FF3F83', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <Globe size={12} color="white" />
+                            </div>
+                            <span style={{ fontWeight: 700, color: darkMode ? '#F8FAFC' : '#0F172A', fontSize: '14px', fontFamily: "'Poppins', sans-serif" }}>Blog Anónimo</span>
+                          </div>
+                          <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: darkMode ? '#1A1A2E' : '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+                            <Pen size={12} color="#FF3F83" />
                           </div>
                         </div>
-
-                        {/* App Content — Blog Anónimo Mobile */}
-                        <div style={{ height: 'calc(100% - 48px)', overflow: 'hidden', background: darkMode ? '#0A1020' : '#F5F0E8' }}>
-                          {/* Blog Header */}
-                          <div style={{ padding: '14px 18px 10px', background: darkMode ? '#0A1020' : '#F5F0E8' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#FF3F83', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  <Globe size={12} color="white" />
-                                </div>
-                                <span style={{ fontWeight: 700, color: darkMode ? '#F8FAFC' : '#0F172A', fontSize: '14px', fontFamily: "'Poppins', sans-serif" }}>Blog Anónimo</span>
-                              </div>
-                              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: darkMode ? '#1A1A2E' : '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-                                <Pen size={12} color="#FF3F83" />
-                              </div>
+                        {/* Filter tabs */}
+                        <div style={{ display: 'flex', gap: '6px', overflowX: 'hidden' }}>
+                          {['Todos','Relaciones','Consejos','Superación'].map((f,i) => (
+                            <div key={i} style={{
+                              padding: '5px 12px', borderRadius: '999px', fontSize: '10px', fontWeight: 600, whiteSpace: 'nowrap',
+                              background: i===0 ? '#FF3F83' : (darkMode ? '#1A1A2E' : '#FFFFFF'), color: i===0 ? '#FFFFFF' : '#64748B',
+                              border: i===0 ? 'none' : (darkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid #E2E8F0'),
+                            }}>{f}</div>
+                          ))}
+                        </div>
+                      </div>
+                      {/* Posts */}
+                      <div style={{ padding: '8px 14px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        {/* Post 1 */}
+                        <div style={{ background: darkMode ? '#1A1A2E' : '#FFFFFF', borderRadius: '14px', padding: '14px', boxShadow: '0 1px 6px rgba(0,0,0,0.04)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                            <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, #FFB6C1, #FF69B4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <span style={{ fontSize: '10px', color: '#fff', fontWeight: 700 }}>CT</span>
                             </div>
-                            {/* Filter tabs */}
-                            <div style={{ display: 'flex', gap: '6px', overflowX: 'hidden' }}>
-                              {['Todos','Relaciones','Consejos','Superación'].map((f,i) => (
-                                <div key={i} style={{
-                                  padding: '5px 12px', borderRadius: '999px', fontSize: '10px', fontWeight: 600, whiteSpace: 'nowrap',
-                                  background: i===0 ? '#FF3F83' : (darkMode ? '#1A1A2E' : '#FFFFFF'), color: i===0 ? '#FFFFFF' : '#64748B',
-                                  border: i===0 ? 'none' : (darkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid #E2E8F0'),
-                                }}>{f}</div>
-                              ))}
+                            <div>
+                              <p style={{ fontWeight: 600, fontSize: '11px', color: darkMode ? '#F8FAFC' : '#0F172A', margin: 0 }}>Corazón Tranquilo</p>
+                              <p style={{ fontSize: '9px', color: '#94A3B8', margin: 0 }}>Hace 2 horas</p>
                             </div>
                           </div>
-
-                          {/* Posts */}
-                          <div style={{ padding: '8px 14px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            {/* Post 1 */}
-                            <div style={{ background: darkMode ? '#1A1A2E' : '#FFFFFF', borderRadius: '14px', padding: '14px', boxShadow: '0 1px 6px rgba(0,0,0,0.04)' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                                <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, #FFB6C1, #FF69B4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  <span style={{ fontSize: '10px', color: '#fff', fontWeight: 700 }}>CT</span>
-                                </div>
-                                <div>
-                                  <p style={{ fontWeight: 600, fontSize: '11px', color: darkMode ? '#F8FAFC' : '#0F172A', margin: 0 }}>Corazón Tranquilo</p>
-                                  <p style={{ fontSize: '9px', color: '#94A3B8', margin: 0 }}>Hace 2 horas</p>
-                                </div>
-                              </div>
-                              <p style={{ fontSize: '12px', color: darkMode ? '#CBD5E1' : '#334155', lineHeight: 1.5, margin: '0 0 10px', fontWeight: 500 }}>Me ayudó hablarle en voz alta</p>
-                              <p style={{ fontSize: '11px', color: '#64748B', lineHeight: 1.5, margin: '0 0 10px' }}>Aunque me costó mucho abrirme, sentir que alguien podría escuchar sin juzgarme me devolvió un poco de paz.</p>
-                              <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
-                                <span style={{ padding: '3px 8px', borderRadius: '999px', fontSize: '9px', fontWeight: 600, background: darkMode ? 'rgba(255,63,131,0.15)' : '#FFF0F6', color: '#FF3F83' }}>Relaciones</span>
-                                <span style={{ padding: '3px 8px', borderRadius: '999px', fontSize: '9px', fontWeight: 600, background: darkMode ? 'rgba(16,185,129,0.15)' : '#ECFDF5', color: '#10B981' }}>Apoyo</span>
-                              </div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', borderTop: darkMode ? '1px solid rgba(255,255,255,0.06)' : '1px solid #F1F5F9', paddingTop: '8px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                  <Heart size={12} color="#FF3F83" fill="#FF3F83" />
-                                  <span style={{ fontSize: '10px', fontWeight: 600, color: '#FF3F83' }}>24</span>
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                  <MessageCircle size={12} color="#94A3B8" />
-                                  <span style={{ fontSize: '10px', color: '#94A3B8' }}>2</span>
-                                </div>
-                              </div>
+                          <p style={{ fontSize: '12px', color: darkMode ? '#CBD5E1' : '#334155', lineHeight: 1.5, margin: '0 0 10px', fontWeight: 500 }}>Me ayudó hablarle en voz alta</p>
+                          <p style={{ fontSize: '11px', color: '#64748B', lineHeight: 1.5, margin: '0 0 10px' }}>Aunque me costó mucho abrirme, sentir que alguien podría escuchar sin juzgarme me devolvió un poco de paz.</p>
+                          <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
+                            <span style={{ padding: '3px 8px', borderRadius: '999px', fontSize: '9px', fontWeight: 600, background: darkMode ? 'rgba(255,63,131,0.15)' : '#FFF0F6', color: '#FF3F83' }}>Relaciones</span>
+                            <span style={{ padding: '3px 8px', borderRadius: '999px', fontSize: '9px', fontWeight: 600, background: darkMode ? 'rgba(16,185,129,0.15)' : '#ECFDF5', color: '#10B981' }}>Apoyo</span>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', borderTop: darkMode ? '1px solid rgba(255,255,255,0.06)' : '1px solid #F1F5F9', paddingTop: '8px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <Heart size={12} color="#FF3F83" fill="#FF3F83" />
+                              <span style={{ fontSize: '10px', fontWeight: 600, color: '#FF3F83' }}>24</span>
                             </div>
-
-                            {/* Post 2 */}
-                            <div style={{ background: darkMode ? '#1A1A2E' : '#FFFFFF', borderRadius: '14px', padding: '14px', boxShadow: '0 1px 6px rgba(0,0,0,0.04)' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                                <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, #C3B1E1, #9333EA)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  <span style={{ fontSize: '10px', color: '#fff', fontWeight: 700 }}>LS</span>
-                                </div>
-                                <div>
-                                  <p style={{ fontWeight: 600, fontSize: '11px', color: darkMode ? '#F8FAFC' : '#0F172A', margin: 0 }}>Luna Serena</p>
-                                  <p style={{ fontSize: '9px', color: '#94A3B8', margin: 0 }}>Hace 5 horas</p>
-                                </div>
-                              </div>
-                              <p style={{ fontSize: '12px', color: darkMode ? '#CBD5E1' : '#334155', lineHeight: 1.5, margin: '0 0 10px', fontWeight: 500 }}>Aprendí a poner límites sin sentir culpa</p>
-                              <p style={{ fontSize: '11px', color: '#64748B', lineHeight: 1.5, margin: '0 0 10px' }}>No es egoísmo poner un límite, es cuidarte. Hoy estoy intentándolo con más calma.</p>
-                              <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
-                                <span style={{ padding: '3px 8px', borderRadius: '999px', fontSize: '9px', fontWeight: 600, background: darkMode ? 'rgba(147,51,234,0.15)' : '#F3E8FF', color: '#9333EA' }}>Superación</span>
-                              </div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', borderTop: darkMode ? '1px solid rgba(255,255,255,0.06)' : '1px solid #F1F5F9', paddingTop: '8px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                  <Heart size={12} color="#94A3B8" />
-                                  <span style={{ fontSize: '10px', color: '#94A3B8' }}>18</span>
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                  <MessageCircle size={12} color="#94A3B8" />
-                                  <span style={{ fontSize: '10px', color: '#94A3B8' }}>1</span>
-                                </div>
-                              </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <MessageCircle size={12} color="#94A3B8" />
+                              <span style={{ fontSize: '10px', color: '#94A3B8' }}>2</span>
+                            </div>
+                          </div>
+                        </div>
+                        {/* Post 2 */}
+                        <div style={{ background: darkMode ? '#1A1A2E' : '#FFFFFF', borderRadius: '14px', padding: '14px', boxShadow: '0 1px 6px rgba(0,0,0,0.04)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                            <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, #C3B1E1, #9333EA)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <span style={{ fontSize: '10px', color: '#fff', fontWeight: 700 }}>LS</span>
+                            </div>
+                            <div>
+                              <p style={{ fontWeight: 600, fontSize: '11px', color: darkMode ? '#F8FAFC' : '#0F172A', margin: 0 }}>Luna Serena</p>
+                              <p style={{ fontSize: '9px', color: '#94A3B8', margin: 0 }}>Hace 5 horas</p>
+                            </div>
+                          </div>
+                          <p style={{ fontSize: '12px', color: darkMode ? '#CBD5E1' : '#334155', lineHeight: 1.5, margin: '0 0 10px', fontWeight: 500 }}>Aprendí a poner límites sin sentir culpa</p>
+                          <p style={{ fontSize: '11px', color: '#64748B', lineHeight: 1.5, margin: '0 0 10px' }}>No es egoísmo poner un límite, es cuidarte. Hoy estoy intentándolo con más calma.</p>
+                          <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
+                            <span style={{ padding: '3px 8px', borderRadius: '999px', fontSize: '9px', fontWeight: 600, background: darkMode ? 'rgba(147,51,234,0.15)' : '#F3E8FF', color: '#9333EA' }}>Superación</span>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', borderTop: darkMode ? '1px solid rgba(255,255,255,0.06)' : '1px solid #F1F5F9', paddingTop: '8px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <Heart size={12} color="#94A3B8" />
+                              <span style={{ fontSize: '10px', color: '#94A3B8' }}>18</span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <MessageCircle size={12} color="#94A3B8" />
+                              <span style={{ fontSize: '10px', color: '#94A3B8' }}>1</span>
                             </div>
                           </div>
                         </div>
                       </div>
-
-                      {/* Home indicator */}
-                      <div style={{
-                        position: 'absolute',
-                        bottom: '12px',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        width: '120px',
-                        height: '4px',
-                        borderRadius: '999px',
-                        background: 'rgba(255,255,255,0.3)',
-                        zIndex: 11,
-                      }} />
                     </div>
-
-                    {/* ─── Mascot — below phone ─── */}
-                    <div style={{
-                      position: 'absolute',
-                      bottom: '-8px',
-                      left: '50%',
-                      transform: 'translateX(-30%)',
-                      zIndex: 20,
-                    }} className="hidden lg:block">
-                      <SafetyMascot size="lg" mascotId="michi-menta" />
-                    </div>
-
-                    {/* Pink halo glow behind phone */}
-                    <div style={{
-                      position: 'absolute',
-                      left: '50%',
-                      top: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      width: '380px',
-                      height: '380px',
-                      borderRadius: '50%',
-                      background: 'radial-gradient(circle, rgba(255,63,131,0.08) 0%, transparent 70%)',
-                      zIndex: 5,
-                      pointerEvents: 'none',
-                    }} />
-
                   </div>
-                </FadeIn>
+                  {/* Home indicator */}
+                  <div style={{ position: 'absolute', bottom: '12px', left: '50%', transform: 'translateX(-50%)', width: '120px', height: '4px', borderRadius: '999px', background: 'rgba(255,255,255,0.3)', zIndex: 11 }} />
+                </div>
               </div>
-            </div>
+            </FadeIn>
           </div>
         </section>
 
@@ -685,7 +598,7 @@ export default function LandingPage({ onEnterApp }) {
                       border: darkMode ? '1px solid rgba(255,255,255,0.06)' : '1px solid #F1F5F9',
                       display: 'flex', alignItems: 'center', gap: '6px',
                     }}>
-                      <img src="/logo.png" alt="SafetyLove" style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
+                      <img src="/logo.webp" loading="lazy" width="48" height="48" alt="SafetyLove" style={{ width: '20px', height: '20px', objectFit: 'contain' }} loading="lazy" decoding="async" />
                       <span style={{ fontWeight: 700, fontSize: '13px', color: darkMode ? '#F8FAFC' : '#0F172A' }}>Safety Love</span>
                     </div>
                   </div>
@@ -845,7 +758,7 @@ export default function LandingPage({ onEnterApp }) {
             {/* Brand */}
             <div className="safety-footer-brand">
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-                <img src="/logo.png" alt="SafetyLove" style={{ width: '80px', height: '80px', objectFit: 'contain' }} />
+                <img src="/logo.webp" loading="lazy" width="48" height="48" alt="SafetyLove" style={{ width: '80px', height: '80px', objectFit: 'contain' }} loading="lazy" decoding="async" />
                 <span style={{ fontSize: '18px', fontWeight: 700, color: darkMode ? '#F8FAFC' : '#101828', fontFamily: "'Poppins', sans-serif" }}>Safety Love</span>
               </div>
               <p style={{ fontSize: '14px', fontWeight: 600, color: '#FF3F83', marginBottom: '8px' }}>Tu bienestar emocional importa.</p>

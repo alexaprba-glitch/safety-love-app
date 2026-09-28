@@ -342,7 +342,7 @@ export default function ConfiguracionSection({ darkMode: dmProp, setDarkMode: se
               </div>
             </div>
           </div>
-          <button onClick={() => { toast(lang === 'es' ? 'Cerrando sesión...' : 'Logging out...'); setTimeout(() => { if (onLogout) onLogout(); }, 800); }}
+          <button onClick={() => { if (onLogout) onLogout(); }}
             className={`w-full py-3.5 rounded-2xl font-semibold text-[13px] transition flex items-center justify-center gap-2 ${dm ? 'bg-white/5 text-slate-300 hover:bg-white/10 border border-white/10' : 'bg-gray-50 text-slate-600 hover:bg-gray-100 border border-gray-200'}`}>
             <LogOut size={16}/> {lang === 'es' ? 'Cerrar sesión' : 'Log out'}
           </button>

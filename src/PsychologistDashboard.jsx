@@ -5,6 +5,8 @@ import {
   Settings, ChevronRight, TrendingUp,
   UserCheck, LogOut, AlertTriangle, MessageCircle, Siren, X, User, Mail, Camera, Pencil, Brain, PenTool
 } from 'lucide-react';
+import { toastError } from './Toast';
+import { PageLoader } from './LoadingSpinner';
 import EstudiantesSection from './EstudiantesSection.jsx';
 import AgendaSection from './AgendaSection.jsx';
 import ConfiguracionStudentSection from './ConfiguracionStudentSection.jsx';
@@ -193,6 +195,7 @@ export default function PsychologistDashboard({ onLogout }) {
   const [assignedStudentCount, setAssignedStudentCount] = useState(0);
   const [followUps, setFollowUps] = useState(FOLLOW_UPS_DEFAULT);
   const [userBio, setUserBio] = useState('Cada pequeño paso cuenta.');
+  const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
@@ -213,10 +216,16 @@ export default function PsychologistDashboard({ onLogout }) {
               setUserPhotoUrl(profile.avatar);
             }
           }
-        } catch {}
+        } catch {
+          toastError('Error al cargar datos');
+        }
         const students = await getAssignedStudents(user.id);
         setAssignedStudentCount(students?.length || 0);
-      } catch {}
+      } catch {
+        toastError('Error al cargar datos');
+      } finally {
+        setDataLoading(false);
+      }
     })();
   }, []);
 
@@ -246,14 +255,14 @@ export default function PsychologistDashboard({ onLogout }) {
     transition: 'all 200ms ease',
   };
 
+  //if (dataLoading) return <PageLoader text="Cargando tu espacio..." />;
+
   return (
     <div className="h-screen flex overflow-hidden" style={{ background: bg, fontFamily: "'Inter', sans-serif" }}>
 
       <style>{`
         h1, h2, h3, h4 { font-family: 'Poppins', sans-serif !important; }
         .psych-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
-        .psych-nav-item { transition: all 180ms ease; }
-        .psych-nav-item:hover { transform: scale(1.08); }
         .psych-link:hover { opacity: 0.8; }
       `}</style>
 
@@ -566,96 +575,154 @@ export default function PsychologistDashboard({ onLogout }) {
         </div>
       )}
 
-      {/* ═══ FLOATING DOCK NAV ═══ */}
+      {/* ═══ SIDEBAR (mismo estilo que rol estudiante) ═══ */}
       <nav
-        className="fixed z-[80] hidden lg:flex flex-col items-center transition-all duration-200 ease-out"
+        className="hidden lg:flex flex-col z-50 shrink-0"
         style={{
-          left: '16px',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          width: '64px',
-          padding: '8px 0',
-          gap: '2px',
-          borderRadius: '20px',
-          background: darkMode ? 'rgba(15,23,36,0.92)' : 'rgba(255,255,255,0.92)',
-          backdropFilter: 'blur(20px) saturate(1.6)',
-          WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
-          boxShadow: darkMode
-            ? '0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04)'
-            : '0 8px 32px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.03)',
+          width: '236px',
+          margin: 0,
+          minHeight: 0,
+          height: '100vh',
+          maxHeight: '100vh',
+          padding: '20px 14px 16px',
+          background: darkMode ? 'linear-gradient(180deg, #151D30 0%, #111827 100%)' : '#FFFFFF',
+          borderRadius: 0,
+          boxShadow: 'none',
+          border: 'none',
+          borderRight: darkMode ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(15,23,42,0.08)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'stretch',
+          gap: '6px',
+          overflow: 'hidden',
+          position: 'sticky',
+          top: 0,
+          alignSelf: 'stretch',
         }}
       >
-        <button
-          onClick={() => setActiveNav('inicio')}
-          className="flex items-center justify-center shrink-0 transition-all duration-180 overflow-hidden"
-          style={{ width: '64px', height: '56px', borderRadius: '14px', background: 'transparent' }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)'; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-        >
-          <img src="/logo.png" alt="SafetyLove" className="w-full h-full object-contain" />
+        {/* Logo */}
+        <button onClick={() => setActiveNav('inicio')} className="flex items-center gap-3 transition-all duration-200" title="Safety Love" style={{ padding: '4px 8px 14px', border: 'none', background: 'transparent', cursor: 'pointer', textAlign: 'left' }}>
+          <img src="/logo.webp" loading="lazy" width="48" height="48" alt="SafetyLove" className="object-contain shrink-0" style={{ width: '64px', height: '64px' }} />
+          <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15, minWidth: 0 }}>
+            <span style={{ fontSize: '17px', fontWeight: 800, letterSpacing: '-0.01em', color: darkMode ? '#F1F5F9' : '#0F172A', fontFamily: "'Poppins', sans-serif", whiteSpace: 'nowrap' }}>Safety Love</span>
+            <span style={{ fontSize: '11px', fontWeight: 500, color: darkMode ? '#64748B' : '#94A3B8', whiteSpace: 'nowrap' }}>Tu espacio seguro</span>
+          </span>
         </button>
 
-        {NAV_ITEMS.map((item) => {
-          const isActive = activeNav === item.id;
-          return (
-            <div key={item.id} className="relative group">
+        {/* Nav items */}
+        <div className="flex flex-col flex-1" style={{ gap: '4px', overflowY: 'auto', overflowX: 'hidden', padding: '2px', margin: '0 -2px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          {NAV_ITEMS.map((link) => {
+            const isActive = activeNav === link.id;
+            return (
               <button
-                onClick={() => setActiveNav(item.id)}
-                className="psych-nav-item flex items-center justify-center shrink-0"
+                key={link.id}
+                onClick={() => setActiveNav(link.id)}
+                className="group"
+                title={link.label}
                 style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '12px',
-                  background: isActive ? 'linear-gradient(135deg, #F43F9E, #E11D6D)' : 'transparent',
-                  color: isActive ? '#FFFFFF' : '#64748B',
-                  boxShadow: isActive ? '0 2px 12px rgba(244,63,158,0.35)' : 'none',
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '8px 10px',
+                  borderRadius: '18px',
+                  border: isActive
+                    ? (darkMode ? '1px solid rgba(244,63,158,0.25)' : '1px solid rgba(244,63,158,0.14)')
+                    : '1px solid transparent',
+                  background: isActive
+                    ? (darkMode ? 'rgba(244,63,158,0.12)' : '#FFF0F6')
+                    : 'transparent',
+                  boxShadow: isActive
+                    ? (darkMode ? '0 2px 12px rgba(244,63,158,0.15)' : '0 2px 12px rgba(244,63,158,0.08)')
+                    : 'none',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'background 250ms ease, box-shadow 250ms ease, border-color 250ms ease, transform 250ms ease',
+                  minHeight: '52px',
+                  overflow: 'hidden',
                 }}
-                onMouseEnter={(e) => { if (!isActive) { e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)'; e.currentTarget.style.color = darkMode ? '#F8FAFC' : '#1E293B'; } }}
-                onMouseLeave={(e) => { if (!isActive) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#64748B'; } }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.05)' : '#FDF2F8';
+                    e.currentTarget.style.borderColor = darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(244,63,158,0.08)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.borderColor = 'transparent';
+                  }
+                }}
               >
-                {item.icon}
+                {/* Icono en contenedor redondeado */}
+                <span style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  background: isActive
+                    ? 'linear-gradient(135deg, #F43F9E, #EC4899)'
+                    : (darkMode ? 'rgba(255,255,255,0.05)' : '#F8FAFC'),
+                  color: isActive ? '#FFFFFF' : (darkMode ? '#7C8DA6' : '#475569'),
+                  boxShadow: isActive ? '0 4px 12px rgba(244,63,158,0.3)' : 'none',
+                  transition: 'background 250ms ease, color 250ms ease, box-shadow 250ms ease',
+                }}>
+                  <span className="shrink-0" style={{ transform: 'scale(0.85)', display: 'flex' }}>{link.icon}</span>
+                </span>
+                {/* Texto dentro del propio elemento */}
+                <span style={{
+                  fontSize: '13.5px',
+                  fontWeight: isActive ? 650 : 500,
+                  color: isActive ? (darkMode ? '#FFFFFF' : '#0F172A') : (darkMode ? '#7C8DA6' : '#64748B'),
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  letterSpacing: '-0.005em',
+                  transition: 'color 250ms ease',
+                  flex: 1,
+                  minWidth: 0,
+                }}>
+                  {link.label}
+                </span>
               </button>
-              <div
-                className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2.5 py-1 rounded-[6px] text-[11px] font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-180 z-50"
-                style={{ background: '#1E293B', color: '#F8FAFC', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}
-              >
-                {item.label}
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
 
-        <div className="h-px w-8 shrink-0" style={{ background: darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)' }} />
-
-        <div className="relative group">
+        {/* Profile */}
+        <div style={{ paddingTop: '12px', borderTop: darkMode ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(15,23,42,0.06)' }}>
           <button
             onClick={() => setProfileOpen(true)}
-            className="flex items-center justify-center shrink-0 transition-all duration-180 overflow-hidden"
+            className="w-full flex items-center transition-all duration-200"
             style={{
-              width: '42px',
-              height: '42px',
-              borderRadius: '12px',
-              background: profileOpen ? 'linear-gradient(135deg, #F43F9E, #E11D6D)' : 'transparent',
-              color: profileOpen ? '#FFFFFF' : '#94A3B8',
-              boxShadow: profileOpen ? '0 2px 12px rgba(244,63,158,0.35)' : 'none',
+              gap: '12px',
+              padding: '8px 10px',
+              borderRadius: '18px',
+              border: '1px solid transparent',
+              background: 'transparent',
+              cursor: 'pointer',
+              textAlign: 'left',
+              overflow: 'hidden',
             }}
-            onMouseEnter={(e) => { if (!profileOpen) { e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)'; e.currentTarget.style.transform = 'scale(1.08)'; } }}
-            onMouseLeave={(e) => { if (!profileOpen) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'scale(1)'; } }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = darkMode ? 'rgba(255,255,255,0.05)' : '#FDF2F8'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+            title={userName}
           >
-            <div className="w-7 h-7 rounded-[8px] overflow-hidden flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #F472B6, #FB7185)' }}>
+            <span style={{ width: '36px', height: '36px', borderRadius: '12px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: 'linear-gradient(135deg, #F472B6, #FB7185)', boxShadow: '0 4px 12px rgba(244,114,182,0.3)', color: '#fff' }}>
               {userPhotoUrl ? (
-                <img src={userPhotoUrl} alt="Avatar" className="w-full h-full object-cover" />
+                <img src={userPhotoUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
-                <span className="text-white text-[11px] font-bold">{userName?.charAt(0) || 'D'}</span>
+                <span style={{ fontSize: '12px', fontWeight: 800 }}>{userName?.charAt(0) || 'D'}</span>
               )}
-            </div>
+            </span>
+            <span style={{ minWidth: 0, flex: 1, display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+              <span style={{ fontSize: '13px', fontWeight: 650, color: darkMode ? '#E2E8F0' : '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{userName || 'Mi perfil'}</span>
+              <span style={{ fontSize: '11px', fontWeight: 500, color: darkMode ? '#64748B' : '#94A3B8' }}>Ver perfil</span>
+            </span>
           </button>
-          <div
-            className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2.5 py-1 rounded-[6px] text-[11px] font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-180 z-50"
-            style={{ background: '#1E293B', color: '#F8FAFC', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}
-          >
-            Perfil
-          </div>
         </div>
       </nav>
 
@@ -712,7 +779,7 @@ export default function PsychologistDashboard({ onLogout }) {
             >
               <div className="w-7 h-7 rounded-[8px] overflow-hidden flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #F472B6, #FB7185)' }}>
                 {userPhotoUrl ? (
-                  <img src={userPhotoUrl} alt="Avatar" className="w-full h-full object-cover" />
+                <img src={userPhotoUrl} alt="Avatar" className="w-full h-full object-cover" loading="lazy" decoding="async" />
                 ) : (
                   <span className="text-white text-[11px] font-bold">{userName?.charAt(0) || 'D'}</span>
                 )}
@@ -723,7 +790,7 @@ export default function PsychologistDashboard({ onLogout }) {
       )}
 
       {/* ═══ MAIN CONTENT ═══ */}
-      <main className="flex-1 overflow-hidden" style={{ paddingLeft: '96px' }}>
+      <main className="flex-1 overflow-hidden pl-0">
         {activeNav === 'estudiantes' ? (
           <div className="h-full">
             <EstudiantesSection darkMode={darkMode} selectedStudentId={selectedStudentId} onStudentSelected={() => setSelectedStudentId(null)} />
@@ -734,7 +801,7 @@ export default function PsychologistDashboard({ onLogout }) {
           </div>
         ) : activeNav === 'blog' ? (
           <div className="h-full">
-            <BlogAnonimo darkMode={darkMode} />
+            <BlogAnonimo darkMode={darkMode} userPhotoUrl={userPhotoUrl} />
           </div>
         ) : activeNav === 'config' ? (
           <div className={`h-full overflow-y-auto custom-scrollbar ${darkMode ? 'bg-[#070D1C]' : 'bg-[#FAFAFC]'}`}>

@@ -3,6 +3,7 @@ import {
   Calendar, Clock, CheckCircle, Plus, ChevronLeft, ChevronRight,
   Video, ArrowRight, User, X
 } from 'lucide-react';
+import { saveStudentSession, removeStudentSessionsWhere, normalizeName } from './studentSessions';
 
 const GRADES = [
   { id: '7mo', label: '7° Primaria' },
@@ -121,6 +122,12 @@ export default function AgendaSection({ darkMode = false, onSessionCreated }) {
       const existing = JSON.parse(localStorage.getItem('safetyLove_cancelledSessions')) ?? [];
       localStorage.setItem('safetyLove_cancelledSessions', JSON.stringify([cancelled, ...existing]));
     } catch {}
+    // Quitarla también de la vista del estudiante
+    removeStudentSessionsWhere((s) =>
+      normalizeName(s.student) === normalizeName(selectedSession.name) &&
+      s.date === selectedSession.date &&
+      s.time === selectedSession.time
+    );
     setEvents(prev => prev.filter(e => !(e.name === selectedSession.name && e.date === selectedSession.date && e.time === selectedSession.time)));
     setSelectedSession(null);
     alert(`Sesión cancelada: ${cancelled.name}`);
@@ -145,6 +152,14 @@ export default function AgendaSection({ darkMode = false, onSessionCreated }) {
       };
       setEvents([...events, newEvent]);
 
+      // Publicarla para que aparezca en "Habla con tu psicólogo" del estudiante
+      saveStudentSession({
+        student: newSession.student,
+        date: newSession.date,
+        time: newSession.time,
+        type: newSession.type,
+      });
+
       if (onSessionCreated) {
         const gradeLabel = GRADES.find(g => g.id === newSession.grade)?.label || '';
         const dateDisplay = new Date(newSession.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -166,9 +181,9 @@ export default function AgendaSection({ darkMode = false, onSessionCreated }) {
 
   // ── Dark mode color tokens ──
   const C = {
-    pageBg: dm ? '#070D1C' : '#F8FAFC',
+    pageBg: dm ? '#070D1C' : '#F5F0E8',
     cardBg: dm ? '#0F1A2E' : '#FFFFFF',
-    cardBg2: dm ? '#162032' : '#F8FAFC',
+    cardBg2: dm ? '#162032' : '#FAF6F1',
     border: dm ? 'rgba(255,255,255,0.06)' : '#E5E7EB',
     borderLight: dm ? 'rgba(255,255,255,0.04)' : '#F1F5F9',
     textPrimary: dm ? '#F1F5F9' : '#111827',

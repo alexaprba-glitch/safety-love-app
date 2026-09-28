@@ -75,6 +75,14 @@ export default function EmotionDayModal({
             from { opacity: 0; transform: scale(0.97) translateY(8px); }
             to { opacity: 1; transform: scale(1) translateY(0); }
           }
+          .emotion-scroll { scrollbar-width: thin; scrollbar-color: #F9A8D4 transparent; }
+          .emotion-scroll::-webkit-scrollbar { width: 8px; }
+          .emotion-scroll::-webkit-scrollbar-track { background: transparent; }
+          .emotion-scroll::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #F9A8D4, #F43F9E);
+            border-radius: 999px;
+          }
+          .emotion-scroll::-webkit-scrollbar-thumb:hover { background: #F43F9E; }
         `}</style>
 
         {/* Close button */}
@@ -93,7 +101,7 @@ export default function EmotionDayModal({
         </button>
 
         {/* Scrollable content */}
-        <div className="overflow-y-auto" style={{ maxHeight: '90vh', padding: '36px 40px 32px' }}>
+        <div className="emotion-scroll overflow-y-auto" style={{ maxHeight: '90vh', padding: '36px 40px 32px' }}>
 
           {/* Header */}
           <header className="text-center mb-8">

@@ -1,10 +1,12 @@
 import { supabase } from '../supabase';
 
-export async function getMoodEntries(userId) {
+export async function getMoodEntries(userId, { limit = 365 } = {}) {
   const { data, error } = await supabase
     .from('mood_entries')
     .select('date, emoji, description, intensity')
-    .eq('user_id', userId);
+    .eq('user_id', userId)
+    .order('date', { ascending: false })
+    .limit(limit);
   if (error) throw error;
   return data;
 }
@@ -16,7 +18,7 @@ export async function upsertMoodEntry(userId, { date, emoji, description, intens
       { user_id: userId, date, emoji, description, intensity },
       { onConflict: 'user_id,date' }
     )
-    .select()
+    .select('date, emoji, description, intensity')
     .single();
   if (error) throw error;
   return data;
@@ -31,12 +33,14 @@ export async function deleteMoodEntry(userId, date) {
   if (error) throw error;
 }
 
-export async function getStudentMoodsForPsychologist(studentIds) {
+export async function getStudentMoodsForPsychologist(studentIds, { limit = 500 } = {}) {
   if (!studentIds || studentIds.length === 0) return [];
   const { data, error } = await supabase
     .from('mood_entries')
     .select('user_id, date, emoji, description, intensity')
-    .in('user_id', studentIds);
+    .in('user_id', studentIds)
+    .order('date', { ascending: false })
+    .limit(limit);
   if (error) throw error;
   return data;
 }

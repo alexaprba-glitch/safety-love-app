@@ -3,9 +3,10 @@ import { supabase } from '../supabase';
 export async function getChatSessions(userId) {
   const { data, error } = await supabase
     .from('chat_sessions')
-    .select('*')
+    .select('id, title, preview, updated_at, created_at')
     .eq('user_id', userId)
-    .order('updated_at', { ascending: false });
+    .order('updated_at', { ascending: false })
+    .limit(50);
   if (error) throw error;
   return data;
 }
@@ -14,7 +15,7 @@ export async function createChatSession(userId, title = 'Chat sin título') {
   const { data, error } = await supabase
     .from('chat_sessions')
     .insert({ user_id: userId, title })
-    .select()
+    .select('id, title, preview, updated_at, created_at')
     .single();
   if (error) throw error;
   return data;
@@ -29,7 +30,7 @@ export async function updateChatSession(sessionId, { title, preview }) {
     .from('chat_sessions')
     .update(updates)
     .eq('id', sessionId)
-    .select()
+    .select('id, title, preview, updated_at, created_at')
     .single();
   if (error) throw error;
   return data;
@@ -43,12 +44,13 @@ export async function deleteChatSession(sessionId) {
   if (error) throw error;
 }
 
-export async function getChatMessages(sessionId) {
+export async function getChatMessages(sessionId, { limit = 100, offset = 0 } = {}) {
   const { data, error } = await supabase
     .from('chat_messages')
-    .select('*')
+    .select('id, role, content, created_at')
     .eq('session_id', sessionId)
-    .order('created_at', { ascending: true });
+    .order('created_at', { ascending: true })
+    .range(offset, offset + limit - 1);
   if (error) throw error;
   return data;
 }
@@ -57,18 +59,8 @@ export async function addChatMessage({ sessionId, userId, role, content }) {
   const { data, error } = await supabase
     .from('chat_messages')
     .insert({ session_id: sessionId, user_id: userId, role, content })
-    .select()
+    .select('id, role, content, created_at')
     .single();
-  if (error) throw error;
-  return data;
-}
-
-export async function addChatMessagesBulk(messages) {
-  if (!messages || messages.length === 0) return [];
-  const { data, error } = await supabase
-    .from('chat_messages')
-    .insert(messages)
-    .select();
   if (error) throw error;
   return data;
 }
